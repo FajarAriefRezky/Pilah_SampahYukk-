@@ -540,18 +540,45 @@
 
     .opening-logo{
       position:relative;
-      width:98px;
-      height:98px;
-      margin:0 auto 12px;
-      border-radius:28px;
+      width:132px;
+      height:132px;
+      margin:0 auto 10px;
+      border-radius:30px;
       display:flex;
       align-items:center;
       justify-content:center;
-      font-size:50px;
+      font-size:44px;
       background:radial-gradient(circle at 30% 25%, rgba(255,255,255,.65) 0 18%, rgba(255,255,255,.18) 19% 45%, rgba(255,255,255,.08) 46% 100%);
       border:1px solid rgba(255,255,255,.18);
       box-shadow:0 16px 30px rgba(0,0,0,.2), inset 0 1px 0 rgba(255,255,255,.22);
       animation:logoFloat 2.8s ease-in-out infinite;
+      overflow:hidden;
+    }
+
+    .opening-logo-img{
+      width:122px;
+      height:122px;
+      object-fit:contain;
+      filter:drop-shadow(0 6px 10px rgba(0,0,0,.16));
+      user-select:none;
+      -webkit-user-drag:none;
+      pointer-events:none;
+    }
+
+    .opening-logo-fallback{
+      position:absolute;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:44px;
+      opacity:0;
+      transition:opacity .2s ease;
+      pointer-events:none;
+    }
+
+    .opening-logo.show-fallback .opening-logo-fallback{
+      opacity:1;
     }
 
     .opening-logo::after{
@@ -581,7 +608,7 @@
 
     .opening-title{
       font-family:'Baloo 2', sans-serif;
-      font-size:34px;
+      font-size:36px;
       line-height:1;
       margin:0 0 10px;
       color:#fff7d5;
@@ -592,7 +619,7 @@
 
     .opening-desc{
       margin:0;
-      font-size:14px;
+      font-size:13px;
       line-height:1.55;
       color:#e9f4eb;
     }
@@ -779,6 +806,8 @@
       .cloud.c7{width:96px;}
       .birds{top:16%;}
       .bird-icon{font-size:12px;}
+      .opening-logo{width:120px; height:120px;}
+      .opening-logo-img{width:112px; height:112px;}
       .play-area{padding-bottom:clamp(54px, 7vh, 90px);}
       .play-area::before{bottom:clamp(6px, 1vh, 26px);}
       .bins-area{bottom:calc(env(safe-area-inset-bottom) + clamp(4px, 1vh, 14px)); padding:0 12px;}
@@ -867,7 +896,10 @@
       <span class="opening-spark" style="right:30%; bottom:34%; animation-duration:10s; animation-delay:-5s;"></span>
     </div>
     <div class="opening-card">
-      <div class="opening-logo">🗑️</div>
+      <div class="opening-logo" id="openingLogoWrap">
+        <img class="opening-logo-img" id="openingLogoImg" src="assets/logo-kids.png" alt="Logo game pilah sampah" />
+        <span class="opening-logo-fallback">🗑️</span>
+      </div>
       <div class="opening-badge">Casual Sorting Game</div>
       <h2 class="opening-title">Pilah <span>Yuk!</span></h2>
       <p class="opening-desc">Tangkap sampah yang jatuh dan pilah ke tempat yang benar sebelum habis nyawa kamu.</p>
@@ -923,6 +955,8 @@
   const binNon = document.getElementById('binNon');
   const startOverlay = document.getElementById('startOverlay');
   const startBtn = document.getElementById('startBtn');
+  const openingLogoWrap = document.getElementById('openingLogoWrap');
+  const openingLogoImg = document.getElementById('openingLogoImg');
   const howToPlayBtn = document.getElementById('howToPlayBtn');
   const soundToggleBtn = document.getElementById('soundToggleBtn');
   const helpModal = document.getElementById('helpModal');
@@ -1179,6 +1213,11 @@
   function pickRandom(){
     return ITEMS[Math.floor(Math.random() * ITEMS.length)];
   }
+
+  openingLogoImg.addEventListener('error', () => {
+    openingLogoWrap.classList.add('show-fallback');
+    openingLogoImg.style.display = 'none';
+  });
 
   function updateLives(){
     livesEl.textContent = '❤️'.repeat(Math.max(lives, 0)) + '✖️'.repeat(Math.max(3 - lives, 0));
