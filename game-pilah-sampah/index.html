@@ -256,15 +256,47 @@
       left:50%;
       transform:translateX(-42.5px);
       z-index:10;
+      will-change:top, transform, opacity;
+      backface-visibility:hidden;
+      -webkit-font-smoothing:antialiased;
     }
     
     .falling-item.drop{
       animation:falling linear forwards;
     }
+
+    .falling-item.caught-good{
+      animation:caughtGood .22s ease-out forwards;
+    }
+
+    .falling-item.caught-bad{
+      animation:caughtBad .22s ease-out forwards;
+    }
+
+    .falling-item.missed{
+      animation:missFade .18s ease-out forwards;
+    }
     
     @keyframes falling{
       from{ top:-100px; opacity:1; }
       to{ top:100%; opacity:1; }
+    }
+
+    @keyframes caughtGood{
+      0%{transform:scale(1) translateY(0); opacity:1;}
+      70%{transform:scale(1.12) translateY(-6px); opacity:1;}
+      100%{transform:scale(.75) translateY(-14px); opacity:0;}
+    }
+
+    @keyframes caughtBad{
+      0%{transform:scale(1) translateY(0) rotate(0deg); opacity:1;}
+      45%{transform:scale(1.05) translateY(-4px) rotate(-5deg); opacity:1;}
+      100%{transform:scale(.8) translateY(-10px) rotate(8deg); opacity:0;}
+    }
+
+    @keyframes missFade{
+      from{opacity:1; transform:translateX(-42.5px) translateY(0);}
+      to{opacity:0; transform:translateX(-42.5px) translateY(18px);}
     }
     
     .item-emoji{font-size:38px; line-height:1;}
@@ -675,45 +707,58 @@
     const randomLeft = minLeft + Math.random() * (maxLeft - minLeft);
     item.style.left = `${randomLeft}px`;
     item.style.transform = 'none';
+    item.dataset.state = 'falling';
     
     item.style.animationDuration = dropTime + 'ms';
 
-    const itemRect = item.getBoundingClientRect();
-    const itemCenterX = (itemRect.left + itemRect.right) / 2;
-    
-    setTimeout(() => {
-      checkCollision(item, itemCenterX);
-      item.remove();
-    }, dropTime);
+    const endAt = performance.now() + dropTime;
+
+    const monitorCollision = () => {
+      if (!gameActive || !item.isConnected || item.dataset.state !== 'falling') return;
+
+      const itemRect = item.getBoundingClientRect();
+      const organikRect = binOrganik.getBoundingClientRect();
+      const nonRect = binNon.getBoundingClientRect();
+
+      if (isTouching(itemRect, organikRect)) {
+        item.dataset.state = 'caught';
+        if (item.dataset.type === 'organik') {
+          handleCorrect(binOrganik, item);
+        } else {
+          handleWrong(binOrganik, item);
+        }
+        return;
+      }
+
+      if (isTouching(itemRect, nonRect)) {
+        item.dataset.state = 'caught';
+        if (item.dataset.type === 'non-organik') {
+          handleCorrect(binNon, item);
+        } else {
+          handleWrong(binNon, item);
+        }
+        return;
+      }
+
+      if (performance.now() >= endAt) {
+        item.dataset.state = 'missed';
+        handleMiss(item);
+        return;
+      }
+
+      requestAnimationFrame(monitorCollision);
+    };
+
+    requestAnimationFrame(monitorCollision);
   }
 
-  function checkCollision(item, itemCenterX){
-    const organikRect = binOrganik.getBoundingClientRect();
-    const nonRect = binNon.getBoundingClientRect();
-    const itemType = item.dataset.type;
-    
-    const organikCenterX = (organikRect.left + organikRect.right) / 2;
-    const nonCenterX = (nonRect.left + nonRect.right) / 2;
-    const catchRadius = 90; // pixels
-    
-    if (Math.abs(itemCenterX - organikCenterX) < catchRadius){
-      if (itemType === 'organik'){
-        handleCorrect(binOrganik);
-      } else {
-        handleWrong(binOrganik);
-      }
-    } else if (Math.abs(itemCenterX - nonCenterX) < catchRadius){
-      if (itemType === 'non-organik'){
-        handleCorrect(binNon);
-      } else {
-        handleWrong(binNon);
-      }
-    } else {
-      handleMiss();
-    }
+  function isTouching(itemRect, binRect){
+    const horizontalOverlap = itemRect.right >= binRect.left + 12 && itemRect.left <= binRect.right - 12;
+    const verticalTouch = itemRect.bottom >= binRect.top - 10 && itemRect.top <= binRect.bottom + 14;
+    return horizontalOverlap && verticalTouch;
   }
 
-  function handleCorrect(bin){
+  function handleCorrect(bin, item){
     score += 10;
     correctCount++;
     updateLevelByProgress();
@@ -726,9 +771,14 @@
     bin.classList.remove('hit');
     void bin.offsetWidth;
     bin.classList.add('hit');
+    if (item && item.isConnected) {
+      item.classList.remove('caught-bad', 'missed');
+      item.classList.add('caught-good');
+      setTimeout(() => item.remove(), 220);
+    }
   }
 
-  function handleWrong(bin){
+  function handleWrong(bin, item){
     lives--;
     updateLives();
     soundWrong();
@@ -739,14 +789,24 @@
     void bin.offsetWidth;
     bin.classList.add('wrong');
     if (lives <= 0) endGame();
+    if (item && item.isConnected) {
+      item.classList.remove('caught-good', 'missed');
+      item.classList.add('caught-bad');
+      setTimeout(() => item.remove(), 220);
+    }
   }
 
-  function handleMiss(){
+  function handleMiss(item){
     lives--;
     updateLives();
     soundMiss();
     showFeedback('TETOD 😵', 'bad', game.clientWidth / 2, game.clientHeight * 0.35);
     if (lives <= 0) endGame();
+    if (item && item.isConnected) {
+      item.classList.remove('caught-good', 'caught-bad');
+      item.classList.add('missed');
+      setTimeout(() => item.remove(), 180);
+    }
   }
 
   function burstConfetti(bin){
