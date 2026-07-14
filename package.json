@@ -1,0 +1,26 @@
+{
+  "name": "pilah-yuk-game",
+  "version": "1.0.0",
+  "description": "Game Sortir Sampah - Tetris Mode",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "tunnel": "npm start & npx localtunnel --port 3000 --print both",
+    "public": "npm start & npx localtunnel --port 3000 --print both",
+    "deploy:cloudflare": "npx wrangler pages deploy game-pilah-sampah --project-name pilah-yuk-game",
+    "deploy:netlify": "npx netlify deploy --prod --dir=game-pilah-sampah",
+    "deploy:vercel": "npx vercel --prod"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "devDependencies": {
+    "localtunnel": "^2.0.2"
+  }
+}

@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Pilah Yuk!">
+  <meta name="theme-color" content="#dff3e6">
+  <title>Pilah Yuk! — Game Sortir Sampah (Tetris Mode)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg-top:#ffd9b3;
+      --bg-mid:#f7b6a6;
+      --bg-bottom:#7fc39f;
+      --organik:#3f8a4f;
+      --organik-dark:#2c6339;
+      --nonorganik:#3a6ea5;
+      --nonorganik-dark:#28507a;
+      --accent:#f4b942;
+      --accent-dark:#d99a1f;
+      --ink:#233225;
+      --card:#fffdf6;
+      --danger:#d1583f;
+    }
+    
+    *{box-sizing:border-box;}
+    
+    html, body{
+      margin:0; padding:0; height:100%;
+      font-family:'Poppins', sans-serif;
+      color:var(--ink);
+      background:linear-gradient(180deg, var(--bg-top) 0%, var(--bg-mid) 42%, var(--bg-bottom) 100%);
+      overflow:hidden;
+      touch-action:none;
+      -webkit-user-select:none; user-select:none;
+    }
+    
+    .game{
+      position:relative;
+      width:100%; height:100vh;
+      max-width:520px; margin:0 auto;
+      display:flex; flex-direction:column;
+      overflow:hidden;
+      background:
+        radial-gradient(circle at 80% 14%, rgba(255,241,198,.9) 0 9%, rgba(255,241,198,0) 22%),
+        linear-gradient(180deg, rgba(255,218,175,.6) 0%, rgba(251,187,168,.45) 40%, rgba(128,194,156,.28) 100%);
+      border-left:1px solid rgba(255,255,255,.35);
+      border-right:1px solid rgba(255,255,255,.35);
+    }
+
+    .game::before,
+    .game::after{
+      content:'';
+      position:absolute;
+      left:0;
+      width:100%;
+      pointer-events:none;
+    }
+
+    .game::before{
+      bottom:140px;
+      height:45%;
+      z-index:1;
+      background:
+        radial-gradient(110% 90% at 10% 100%, rgba(62,96,111,.45) 0%, rgba(62,96,111,0) 55%),
+        radial-gradient(95% 85% at 72% 100%, rgba(74,107,119,.44) 0%, rgba(74,107,119,0) 58%),
+        radial-gradient(120% 110% at 40% 100%, rgba(86,125,125,.55) 0%, rgba(86,125,125,0) 60%);
+    }
+
+    .game::after{
+      bottom:0;
+      height:42%;
+      z-index:2;
+      background:
+        linear-gradient(180deg, rgba(84,141,109,.15) 0%, rgba(68,127,94,.66) 50%, rgba(53,103,76,.9) 100%),
+        repeating-linear-gradient(-11deg, rgba(214,252,200,.13) 0 10px, rgba(100,166,114,.05) 10px 22px);
+    }
+
+    .sky-layer{
+      position:absolute;
+      inset:0;
+      z-index:2;
+      pointer-events:none;
+      overflow:hidden;
+    }
+
+    .cloud{
+      position:absolute;
+      height:42px;
+      border-radius:999px;
+      background:linear-gradient(180deg, rgba(255,248,235,.8) 0%, rgba(255,232,214,.42) 100%);
+      box-shadow:0 8px 20px rgba(255,178,140,.18);
+      opacity:.95;
+      animation:cloudDrift linear infinite;
+    }
+
+    .cloud::before,
+    .cloud::after{
+      content:'';
+      position:absolute;
+      border-radius:999px;
+      background:inherit;
+    }
+
+    .cloud::before{width:36%; height:130%; left:13%; top:-52%;}
+    .cloud::after{width:46%; height:120%; right:10%; top:-42%;}
+
+    .cloud.c1{width:120px; top:11%; left:-24%; animation-duration:42s;}
+    .cloud.c2{width:92px; top:18%; left:-30%; animation-duration:33s; animation-delay:-9s; opacity:.82;}
+    .cloud.c3{width:142px; top:24%; left:-40%; animation-duration:48s; animation-delay:-19s;}
+    .cloud.c4{width:78px; top:8%; left:-34%; animation-duration:36s; animation-delay:-14s; opacity:.76;}
+    .cloud.c5{width:110px; top:28%; left:-46%; animation-duration:39s; animation-delay:-6s; opacity:.72;}
+    .cloud.c6{width:86px; top:15%; left:-52%; animation-duration:45s; animation-delay:-24s; opacity:.68;}
+    .cloud.c7{width:132px; top:5%; left:-60%; animation-duration:51s; animation-delay:-30s; opacity:.6;}
+
+    @keyframes cloudDrift{
+      from{transform:translateX(0);}
+      to{transform:translateX(165%);}
+    }
+
+    .birds{
+      position:absolute;
+      top:14%;
+      left:-22%;
+      width:120px;
+      height:46px;
+      opacity:.68;
+      animation:birdFlight 22s linear infinite;
+    }
+
+    .birds::before,
+    .birds::after{
+      content:'';
+      position:absolute;
+      width:16px;
+      height:8px;
+      border-top:2px solid rgba(72,86,96,.82);
+      border-radius:50% 50% 0 0;
+      transform-origin:center;
+      animation:wingFlap .8s ease-in-out infinite;
+    }
+
+    .birds::before{left:0; top:8px;}
+    .birds::after{left:12px; top:8px; transform:scaleX(-1);}
+
+    .birds.b2{top:20%; left:-30%; transform:scale(.8); animation-duration:27s; animation-delay:-8s; opacity:.55;}
+    .birds.b3{top:12%; left:-36%; transform:scale(.62); animation-duration:31s; animation-delay:-15s; opacity:.5;}
+
+    .bird-icon{
+      position:absolute;
+      left:-16%;
+      top:14%;
+      z-index:2;
+      font-size:14px;
+      opacity:.66;
+      filter:saturate(.85);
+      animation:birdIconFlight linear infinite;
+      text-shadow:0 1px 2px rgba(0,0,0,.16);
+    }
+
+    .bird-icon.i2{top:10%; font-size:12px; animation-duration:26s; animation-delay:-5s; opacity:.58;}
+    .bird-icon.i3{top:22%; font-size:13px; animation-duration:31s; animation-delay:-11s; opacity:.62;}
+    .bird-icon.i4{top:16%; font-size:11px; animation-duration:35s; animation-delay:-17s; opacity:.5;}
+
+    @keyframes birdIconFlight{
+      0%{transform:translateX(0) translateY(0) rotate(-4deg);}
+      30%{transform:translateX(45vw) translateY(-8px) rotate(3deg);}
+      60%{transform:translateX(92vw) translateY(5px) rotate(-2deg);}
+      100%{transform:translateX(145vw) translateY(-3px) rotate(4deg);}
+    }
+
+    @keyframes birdFlight{
+      0%{transform:translateX(0) translateY(0);}
+      25%{transform:translateX(48vw) translateY(-10px);}
+      50%{transform:translateX(88vw) translateY(6px);}
+      75%{transform:translateX(120vw) translateY(-5px);}
+      100%{transform:translateX(150vw) translateY(3px);}
+    }
+
+    @keyframes wingFlap{
+      0%,100%{transform:rotate(10deg);}
+      50%{transform:rotate(-16deg);}
+    }
+    
+    header{
+      position:relative; z-index:5;
+      padding:14px 16px 8px;
+      display:flex; align-items:center; justify-content:space-between;
+      background:linear-gradient(180deg, rgba(255,255,255,.42) 0%, rgba(255,255,255,.15) 100%);
+      backdrop-filter:blur(4px);
+    }
+    
+    .title{
+      font-family:'Baloo 2', sans-serif;
+      font-weight:800; font-size:22px;
+      color:var(--organik-dark);
+      letter-spacing:.5px;
+    }
+    
+    .title span{color:var(--nonorganik-dark);}
+    
+    .stats{
+      display:flex; gap:10px; align-items:center;
+    }
+    
+    .stat-pill{
+      background:rgba(255,253,246,.92);
+      border-radius:999px;
+      padding:6px 12px;
+      font-family:'Baloo 2', sans-serif;
+      font-weight:700; font-size:14px;
+      box-shadow:0 3px 0 rgba(0,0,0,.08), 0 0 0 1px rgba(255,255,255,.6) inset;
+      display:flex; align-items:center; gap:5px;
+    }
+    
+    .lives{display:flex; gap:2px; font-size:16px;}
+    
+    .play-area{
+      position:relative;
+      flex:1;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      z-index:3;
+      overflow:hidden;
+    }
+
+    .play-area::before{
+      content:'';
+      position:absolute;
+      left:0;
+      bottom:95px;
+      width:100%;
+      height:120px;
+      z-index:0;
+      pointer-events:none;
+      background:
+        repeating-linear-gradient(0deg, rgba(170,218,155,.45) 0 2px, rgba(145,201,132,.12) 2px 10px),
+        linear-gradient(180deg, rgba(124,184,116,.18) 0%, rgba(87,152,97,.45) 100%);
+    }
+    
+    .falling-item{
+      position:absolute;
+      width:85px; height:85px;
+      border-radius:18px;
+      background:var(--card);
+      box-shadow:0 6px 12px rgba(0,0,0,.15);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      left:50%;
+      transform:translateX(-42.5px);
+      z-index:10;
+    }
+    
+    .falling-item.drop{
+      animation:falling linear forwards;
+    }
+    
+    @keyframes falling{
+      from{ top:-100px; opacity:1; }
+      to{ top:100%; opacity:1; }
+    }
+    
+    .item-emoji{font-size:38px; line-height:1;}
+    .item-label{font-size:9px; font-weight:600; margin-top:2px; color:#666; text-align:center;}
+    
+    .bins-area{
+      position:relative;
+      z-index:6;
+      padding:0 16px 24px;
+      height:160px;
+      display:flex;
+      justify-content:center;
+      align-items:flex-end;
+    }
+    
+    .bins-wrapper{
+      display:flex;
+      justify-content:center;
+      gap:0;
+      width:100%;
+      user-select:none;
+    }
+    
+    .bin{
+      flex:0 0 140px;
+      border-radius:50% 50% 40% 40%;
+      padding:16px 0;
+      text-align:center;
+      position:relative;
+      box-shadow:0 8px 0 rgba(0,0,0,.2), inset 0 -4px 8px rgba(0,0,0,.2);
+      cursor:grab;
+      transition:transform .1s;
+      height:120px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .bin + .bin{margin-left:-8px;}
+    
+    .bin:active{cursor:grabbing;}
+    
+    .bin.organik{background:linear-gradient(135deg, #4a9d5f 0%, var(--organik-dark) 100%);}
+    .bin.non-organik{background:linear-gradient(135deg, #4a7ab5 0%, var(--nonorganik-dark) 100%);}
+    
+    .bin .icon{font-size:56px; display:block; margin-bottom:4px; line-height:1;}
+    .bin .label{
+      font-family:'Baloo 2', sans-serif;
+      font-weight:600;
+      color:#fff;
+      font-size:11px;
+      padding:0;
+      letter-spacing:.2px;
+      text-shadow:0 2px 4px rgba(0,0,0,.2);
+    }
+    
+    .bin.hit{
+      animation:binHit .3s;
+    }
+    
+    @keyframes binHit{
+      0%{transform:scaleY(1); box-shadow:0 6px 0 rgba(0,0,0,.16);}
+      50%{transform:scaleY(1.1); box-shadow:0 2px 0 rgba(0,0,0,.16), 0 0 0 6px rgba(255,255,255,.4) inset;}
+      100%{transform:scaleY(1); box-shadow:0 6px 0 rgba(0,0,0,.16);}
+    }
+    
+    .bin.wrong{animation:binWrong .3s;}
+    
+    @keyframes binWrong{
+      0%{filter:none;}
+      50%{filter:brightness(.7) saturate(1.5) hue-rotate(-15deg);}
+      100%{filter:none;}
+    }
+    
+    .confetti{
+      position:absolute;
+      width:8px; height:8px;
+      border-radius:50%;
+      z-index:20;
+      pointer-events:none;
+    }
+
+    .feedback-float{
+      position:absolute;
+      z-index:25;
+      pointer-events:none;
+      font-family:'Baloo 2', sans-serif;
+      font-weight:800;
+      font-size:24px;
+      letter-spacing:.3px;
+      text-shadow:0 3px 8px rgba(0,0,0,.25);
+      opacity:0;
+      transform:translate(-50%, 0) scale(.9);
+      animation:feedbackPop .8s ease-out forwards;
+      white-space:nowrap;
+    }
+
+    .feedback-float.good{color:#fff6bf;}
+    .feedback-float.bad{color:#ffd0d0;}
+
+    @keyframes feedbackPop{
+      0%{opacity:0; transform:translate(-50%, 6px) scale(.85);}
+      20%{opacity:1; transform:translate(-50%, -8px) scale(1.05);}
+      100%{opacity:0; transform:translate(-50%, -46px) scale(1);}
+    }
+    
+    .overlay{
+      position:absolute;
+      inset:0;
+      background:linear-gradient(180deg, rgba(36,47,58,.78) 0%, rgba(24,38,31,.9) 100%);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:16px;
+      z-index:50;
+      color:#fff;
+      text-align:center;
+      padding:24px;
+    }
+    
+    .overlay h2{
+      font-family:'Baloo 2', sans-serif;
+      font-size:28px; margin:0;
+    }
+    
+    .overlay p{margin:0; font-size:14px; color:#dfeee2; max-width:300px; line-height:1.5;}
+    
+    .btn{
+      font-family:'Baloo 2', sans-serif;
+      font-weight:700; font-size:16px;
+      border:none;
+      border-radius:999px;
+      padding:12px 28px;
+      background:var(--accent);
+      color:#4a3200;
+      box-shadow:0 4px 0 var(--accent-dark);
+      cursor:pointer;
+      margin-top:8px;
+      transition:all .1s;
+    }
+    
+    .btn:active{
+      transform:translateY(2px);
+      box-shadow:0 2px 0 var(--accent-dark);
+    }
+
+    @media (max-width:480px){
+      .title{font-size:20px;}
+      .stats{gap:6px;}
+      .stat-pill{padding:5px 9px; font-size:13px;}
+      .game::before{bottom:126px;}
+      .cloud{height:34px;}
+      .cloud.c1{width:92px;}
+      .cloud.c2{width:76px;}
+      .cloud.c3{width:108px;}
+      .cloud.c4{width:66px;}
+      .cloud.c5{width:84px;}
+      .cloud.c6{width:72px;}
+      .cloud.c7{width:96px;}
+      .birds{top:16%;}
+      .bird-icon{font-size:12px;}
+      .bins-area{height:145px; padding:0 12px 18px;}
+      .bin{flex:0 0 126px; height:108px;}
+      .bin .icon{font-size:48px;}
+    }
+  </style>
+</head>
+<body>
+
+<div class="game" id="game">
+  <div class="sky-layer" aria-hidden="true">
+    <span class="cloud c1"></span>
+    <span class="cloud c2"></span>
+    <span class="cloud c3"></span>
+    <span class="cloud c4"></span>
+    <span class="cloud c5"></span>
+    <span class="cloud c6"></span>
+    <span class="cloud c7"></span>
+    <span class="birds b1"></span>
+    <span class="birds b2"></span>
+    <span class="birds b3"></span>
+    <span class="bird-icon i1">🐦</span>
+    <span class="bird-icon i2">🕊️</span>
+    <span class="bird-icon i3">🐦</span>
+    <span class="bird-icon i4">🕊️</span>
+  </div>
+  <header>
+    <div class="title">Pilah <span>Yuk!</span></div>
+    <div class="stats">
+      <div class="stat-pill">⭐ <span id="score">0</span></div>
+      <div class="stat-pill">LV <span id="level">1</span></div>
+      <div class="stat-pill lives" id="lives">❤️❤️❤️</div>
+    </div>
+  </header>
+
+  <div class="play-area" id="playArea"></div>
+
+  <div class="bins-area">
+    <div class="bins-wrapper" id="binsWrapper">
+      <div class="bin organik" data-type="organik" id="binOrganik">
+        <span class="icon">🗑️</span>
+        <div class="label">ORGANIK</div>
+      </div>
+      <div class="bin non-organik" data-type="non-organik" id="binNon">
+        <span class="icon">🗑️</span>
+        <div class="label">NON ORGANIK</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="startOverlay">
+    <h2>Pilah Yuk! 🗑️</h2>
+    <p>Sampah jatuh dari atas! Geser tempat sampah ke kiri atau kanan untuk menangkapnya. Sampah organik ke tempat organik, sampah non-organik ke tempat non-organik. Salah 3 kali, permainan selesai!</p>
+    <button class="btn" id="startBtn">Mulai Main</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  const ITEMS = [
+    {emoji:'🍌', label:'Kulit pisang', type:'organik'},
+    {emoji:'🥬', label:'Sisa sayur', type:'organik'},
+    {emoji:'🍗', label:'Sisa makanan', type:'organik'},
+    {emoji:'🍚', label:'Nasi basi', type:'organik'},
+    {emoji:'🦴', label:'Tulang ayam', type:'organik'},
+    {emoji:'☕', label:'Ampas kopi', type:'organik'},
+    {emoji:'🥚', label:'Cangkang telur', type:'organik'},
+    {emoji:'🍎', label:'Sisa buah', type:'organik'},
+    {emoji:'🧴', label:'Botol plastik', type:'non-organik'},
+    {emoji:'🥫', label:'Kaleng minuman', type:'non-organik'},
+    {emoji:'🍾', label:'Botol kaca', type:'non-organik'},
+    {emoji:'🛍️', label:'Plastik kresek', type:'non-organik'},
+    {emoji:'🥤', label:'Gelas plastik', type:'non-organik'},
+    {emoji:'🧃', label:'Kotak minuman', type:'non-organik'},
+    {emoji:'🔋', label:'Baterai bekas', type:'non-organik'},
+    {emoji:'🧻', label:'Tisu bekas', type:'non-organik'},
+  ];
+
+  const game = document.getElementById('game');
+  const playArea = document.getElementById('playArea');
+  const scoreEl = document.getElementById('score');
+  const levelEl = document.getElementById('level');
+  const livesEl = document.getElementById('lives');
+  const binOrganik = document.getElementById('binOrganik');
+  const binNon = document.getElementById('binNon');
+  const startOverlay = document.getElementById('startOverlay');
+  const startBtn = document.getElementById('startBtn');
+
+  let score = 0;
+  let lives = 3;
+  let level = 1;
+  let correctCount = 0;
+  let gameActive = false;
+  const BASE_DROP_TIME = 5500;
+  const BASE_SPAWN_RATE = 3300;
+  const MIN_DROP_TIME = 2200;
+  const MIN_SPAWN_RATE = 1300;
+  let dropTime = BASE_DROP_TIME;
+  let spawnRate = BASE_SPAWN_RATE;
+  let dropInterval;
+  let organikOffset = 0;
+  let nonOffset = 0;
+  let draggingBin = null;
+  let dragStartX = 0;
+  let dragStartOffset = 0;
+
+  // Audio context & sound effects
+  let audioContext;
+  const initAudio = () => {
+    if (!audioContext) {
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    }
+  };
+
+  const playSound = (frequency, duration, type = 'sine', volume = 0.3) => {
+    if (!audioContext) initAudio();
+    
+    const osc = audioContext.createOscillator();
+    const gain = audioContext.createGain();
+    
+    osc.type = type;
+    osc.frequency.value = frequency;
+    gain.gain.setValueAtTime(volume, audioContext.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+    
+    osc.connect(gain);
+    gain.connect(audioContext.destination);
+    osc.start(audioContext.currentTime);
+    osc.stop(audioContext.currentTime + duration);
+  };
+
+  const soundCorrect = () => {
+    playSound(659.25, 0.12, 'triangle', 0.22);
+    setTimeout(() => playSound(783.99, 0.12, 'triangle', 0.23), 90);
+    setTimeout(() => playSound(987.77, 0.16, 'triangle', 0.2), 180);
+  };
+
+  const soundWrong = () => {
+    playSound(280, 0.14, 'sawtooth', 0.24);
+    setTimeout(() => playSound(190, 0.2, 'sawtooth', 0.23), 100);
+    setTimeout(() => playSound(140, 0.23, 'sawtooth', 0.2), 210);
+  };
+
+  const soundMiss = () => {
+    playSound(250, 0.3, 'sine', 0.15);
+  };
+
+  const soundGameOver = () => {
+    playSound(400, 0.2, 'sine', 0.25);
+    setTimeout(() => playSound(350, 0.2, 'sine', 0.25), 150);
+    setTimeout(() => playSound(300, 0.3, 'sine', 0.25), 280);
+  };
+
+  const soundLevelUp = () => {
+    playSound(659.25, 0.13, 'triangle', 0.2);
+    setTimeout(() => playSound(783.99, 0.16, 'triangle', 0.22), 90);
+  };
+
+  function showFeedback(text, type, x, y){
+    const tag = document.createElement('div');
+    tag.className = `feedback-float ${type}`;
+    tag.textContent = text;
+    tag.style.left = `${x}px`;
+    tag.style.top = `${y}px`;
+    game.appendChild(tag);
+    setTimeout(() => tag.remove(), 820);
+  }
+
+  function pickRandom(){
+    return ITEMS[Math.floor(Math.random() * ITEMS.length)];
+  }
+
+  function updateLives(){
+    livesEl.textContent = '❤️'.repeat(Math.max(lives, 0)) + '✖️'.repeat(Math.max(3 - lives, 0));
+  }
+
+  function applyDifficulty(){
+    dropTime = Math.max(MIN_DROP_TIME, BASE_DROP_TIME - (level - 1) * 260);
+    spawnRate = Math.max(MIN_SPAWN_RATE, BASE_SPAWN_RATE - (level - 1) * 170);
+
+    if (gameActive){
+      clearInterval(dropInterval);
+      dropInterval = setInterval(spawnWave, spawnRate);
+    }
+  }
+
+  function updateLevelByProgress(){
+    const nextLevel = Math.min(20, 1 + Math.floor(correctCount / 5));
+    if (nextLevel !== level){
+      level = nextLevel;
+      levelEl.textContent = level;
+      soundLevelUp();
+      applyDifficulty();
+    }
+  }
+
+  function getItemsPerWave(){
+    // Level naik -> item per gelombang makin banyak.
+    return Math.min(1 + Math.floor((level - 1) / 2), 5);
+  }
+
+  function spawnWave(){
+    if (!gameActive) return;
+    const itemsPerWave = getItemsPerWave();
+    for (let i = 0; i < itemsPerWave; i++){
+      setTimeout(() => {
+        if (gameActive) spawnItem();
+      }, i * 180);
+    }
+  }
+
+  function spawnItem(){
+    if (!gameActive) return;
+
+    const data = pickRandom();
+    const item = document.createElement('div');
+    item.className = 'falling-item drop';
+    item.innerHTML = `<div class="item-emoji">${data.emoji}</div><div class="item-label">${data.label}</div>`;
+    item.dataset.type = data.type;
+    playArea.appendChild(item);
+
+    const areaWidth = playArea.clientWidth;
+    const itemWidth = item.offsetWidth || 85;
+    const minLeft = 8;
+    const maxLeft = Math.max(minLeft, areaWidth - itemWidth - 8);
+    const randomLeft = minLeft + Math.random() * (maxLeft - minLeft);
+    item.style.left = `${randomLeft}px`;
+    item.style.transform = 'none';
+    
+    item.style.animationDuration = dropTime + 'ms';
+
+    const itemRect = item.getBoundingClientRect();
+    const itemCenterX = (itemRect.left + itemRect.right) / 2;
+    
+    setTimeout(() => {
+      checkCollision(item, itemCenterX);
+      item.remove();
+    }, dropTime);
+  }
+
+  function checkCollision(item, itemCenterX){
+    const organikRect = binOrganik.getBoundingClientRect();
+    const nonRect = binNon.getBoundingClientRect();
+    const itemType = item.dataset.type;
+    
+    const organikCenterX = (organikRect.left + organikRect.right) / 2;
+    const nonCenterX = (nonRect.left + nonRect.right) / 2;
+    const catchRadius = 90; // pixels
+    
+    if (Math.abs(itemCenterX - organikCenterX) < catchRadius){
+      if (itemType === 'organik'){
+        handleCorrect(binOrganik);
+      } else {
+        handleWrong(binOrganik);
+      }
+    } else if (Math.abs(itemCenterX - nonCenterX) < catchRadius){
+      if (itemType === 'non-organik'){
+        handleCorrect(binNon);
+      } else {
+        handleWrong(binNon);
+      }
+    } else {
+      handleMiss();
+    }
+  }
+
+  function handleCorrect(bin){
+    score += 10;
+    correctCount++;
+    updateLevelByProgress();
+    scoreEl.textContent = score;
+    soundCorrect();
+    const r = bin.getBoundingClientRect();
+    const areaRect = game.getBoundingClientRect();
+    showFeedback('NICEE 😎', 'good', r.left - areaRect.left + r.width / 2, r.top - areaRect.top + 8);
+    burstConfetti(bin);
+    bin.classList.remove('hit');
+    void bin.offsetWidth;
+    bin.classList.add('hit');
+  }
+
+  function handleWrong(bin){
+    lives--;
+    updateLives();
+    soundWrong();
+    const r = bin.getBoundingClientRect();
+    const areaRect = game.getBoundingClientRect();
+    showFeedback('TETOD 😵', 'bad', r.left - areaRect.left + r.width / 2, r.top - areaRect.top + 8);
+    bin.classList.remove('wrong');
+    void bin.offsetWidth;
+    bin.classList.add('wrong');
+    if (lives <= 0) endGame();
+  }
+
+  function handleMiss(){
+    lives--;
+    updateLives();
+    soundMiss();
+    showFeedback('TETOD 😵', 'bad', game.clientWidth / 2, game.clientHeight * 0.35);
+    if (lives <= 0) endGame();
+  }
+
+  function burstConfetti(bin){
+    const r = bin.getBoundingClientRect();
+    const areaRect = game.getBoundingClientRect();
+    const colors = ['#f4b942', '#3f8a4f', '#3a6ea5', '#ffffff', '#d1583f'];
+    
+    for (let i = 0; i < 10; i++){
+      const c = document.createElement('div');
+      c.className = 'confetti';
+      c.style.background = colors[Math.floor(Math.random() * colors.length)];
+      c.style.left = (r.left - areaRect.left + r.width / 2) + 'px';
+      c.style.top = (r.top - areaRect.top + 20) + 'px';
+      game.appendChild(c);
+      
+      const angle = Math.random() * Math.PI - Math.PI / 2;
+      const dist = 50 + Math.random() * 70;
+      const dx = Math.cos(angle) * dist;
+      const dy = -Math.abs(Math.sin(angle) * dist) - 40;
+      
+      c.animate([
+        {transform:'translate(0,0) rotate(0deg)', opacity:1},
+        {transform:`translate(${dx}px, ${dy+120}px) rotate(${Math.random()*360}deg)`, opacity:0}
+      ], {duration:700, easing:'ease-out'});
+      
+      setTimeout(() => c.remove(), 750);
+    }
+  }
+
+  function endGame(){
+    gameActive = false;
+    clearInterval(dropInterval);
+    soundGameOver();
+    const overlay = document.createElement('div');
+    overlay.className = 'overlay';
+    overlay.innerHTML = `
+      <h2>Game Over 😢</h2>
+      <p>Skor akhir kamu: <strong>${score}</strong></p>
+      <button class="btn" id="retryBtn">Main Lagi</button>
+    `;
+    game.appendChild(overlay);
+    document.getElementById('retryBtn').addEventListener('click', () => {
+      overlay.remove();
+      resetGame();
+    });
+  }
+
+  function resetGame(){
+    score = 0;
+    lives = 3;
+    level = 1;
+    correctCount = 0;
+    levelEl.textContent = level;
+    organikOffset = 0;
+    nonOffset = 0;
+    binOrganik.style.transform = 'translateX(0)';
+    binNon.style.transform = 'translateX(0)';
+    scoreEl.textContent = score;
+    updateLives();
+    playArea.innerHTML = '';
+    applyDifficulty();
+    gameActive = true;
+    clearInterval(dropInterval);
+    dropInterval = setInterval(spawnWave, spawnRate);
+    spawnWave();
+  }
+
+  // Bins drag handling: each bin moves independently
+  function startBinDrag(e, bin){
+    if (!gameActive) return;
+    draggingBin = bin;
+    draggingBin.setPointerCapture?.(e.pointerId);
+    draggingBin.style.zIndex = '7';
+    dragStartX = e.clientX;
+    dragStartOffset = bin === binOrganik ? organikOffset : nonOffset;
+    draggingBin.style.transition = 'none';
+  }
+
+  binOrganik.addEventListener('pointerdown', (e) => startBinDrag(e, binOrganik));
+  binNon.addEventListener('pointerdown', (e) => startBinDrag(e, binNon));
+
+  document.addEventListener('pointermove', (e) => {
+    if (!draggingBin || !gameActive) return;
+    const delta = e.clientX - dragStartX;
+    const newOffset = dragStartOffset + delta;
+
+    if (draggingBin === binOrganik){
+      organikOffset = newOffset;
+      binOrganik.style.transform = `translateX(${organikOffset}px)`;
+    } else {
+      nonOffset = newOffset;
+      binNon.style.transform = `translateX(${nonOffset}px)`;
+    }
+  });
+
+  document.addEventListener('pointerup', () => {
+    if (!draggingBin) return;
+    draggingBin.style.transition = 'transform .25s ease-out';
+    draggingBin.style.zIndex = '';
+    draggingBin = null;
+  });
+
+  startBtn.addEventListener('click', () => {
+    initAudio();
+    levelEl.textContent = level;
+    applyDifficulty();
+    startOverlay.remove();
+    updateLives();
+    gameActive = true;
+    dropInterval = setInterval(spawnWave, spawnRate);
+    spawnWave();
+  });
+
+})();
+</script>
+
+</body>
+</html>

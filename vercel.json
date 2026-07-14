@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/game-pilah-sampah/index.html"
+    }
+  ]
+}

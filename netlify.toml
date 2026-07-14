@@ -1,0 +1,7 @@
+[build]
+publish = "game-pilah-sampah"
+
+[[redirects]]
+from = "/*"
+to = "/index.html"
+status = 200
