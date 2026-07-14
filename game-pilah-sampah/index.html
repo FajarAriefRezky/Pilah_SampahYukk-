@@ -70,11 +70,10 @@
     }
 
     .game.is-playing .bin{
-      animation:binEnter .55s cubic-bezier(.2,.9,.2,1) both;
+      animation:none;
+      opacity:1;
+      transform:none;
     }
-
-    .game.is-playing .bin.organik{animation-delay:.18s;}
-    .game.is-playing .bin.non-organik{animation-delay:.24s;}
 
     .game::before,
     .game::after{
@@ -356,12 +355,22 @@
       position:relative;
       box-shadow:0 8px 0 rgba(0,0,0,.2), inset 0 -4px 8px rgba(0,0,0,.2);
       cursor:grab;
-      transition:transform .1s;
+      transition:transform .18s cubic-bezier(.2,.8,.2,1), box-shadow .18s ease;
       height:120px;
       display:flex;
       flex-direction:column;
       align-items:center;
       justify-content:center;
+      will-change:transform;
+    }
+
+    .bin.dragging{
+      box-shadow:0 14px 24px rgba(0,0,0,.22), inset 0 -4px 8px rgba(0,0,0,.2);
+      transition:none;
+    }
+
+    .bin.dragging .icon{
+      transform:translateY(-2px) scale(1.04);
     }
 
     .bin + .bin{margin-left:-8px;}
@@ -647,12 +656,6 @@
       100%{transform:translateY(0);}
     }
 
-    @keyframes binEnter{
-      0%{opacity:0; transform:translateY(28px) scale(.9);}
-      60%{opacity:1; transform:translateY(-4px) scale(1.02);}
-      100%{opacity:1; transform:translateY(0) scale(1);}
-    }
-
     @keyframes popupScale{
       0%{opacity:0; transform:translateY(14px) scale(.88);}
       100%{opacity:1; transform:translateY(0) scale(1);}
@@ -779,7 +782,7 @@
       .play-area{padding-bottom:clamp(54px, 7vh, 90px);}
       .play-area::before{bottom:clamp(6px, 1vh, 26px);}
       .bins-area{bottom:calc(env(safe-area-inset-bottom) + clamp(4px, 1vh, 14px)); padding:0 12px;}
-      .bin{flex:0 0 116px; height:100px;}
+      .bin{flex:0 0 124px; height:108px;}
       .bin .icon{font-size:42px;}
     }
 
@@ -795,6 +798,17 @@
       .play-area{padding-bottom:clamp(58px, 8vh, 96px);}
       .play-area::before{bottom:clamp(8px, 1.2vh, 30px);}
       .bins-area{bottom:calc(env(safe-area-inset-bottom) + clamp(4px, 1vh, 16px)); padding:0 12px;}
+      .bin{
+        flex:0 0 130px;
+        height:112px;
+      }
+      .bin::before{
+        content:'';
+        position:absolute;
+        inset:-18px -12px -14px;
+        border-radius:inherit;
+        pointer-events:auto;
+      }
     }
   </style>
 </head>
@@ -931,6 +945,9 @@
   let draggingBin = null;
   let dragStartX = 0;
   let dragStartOffset = 0;
+  let organikTargetOffset = 0;
+  let nonTargetOffset = 0;
+  let dragRaf = null;
   let soundEnabled = true;
   let startingGame = false;
   let parallaxX = 0;
@@ -1105,6 +1122,39 @@
       startBgm();
       spawnWave();
     }, 300);
+  }
+
+  function animateBinSettled(bin, targetOffset){
+    if (dragRaf) {
+      cancelAnimationFrame(dragRaf);
+      dragRaf = null;
+    }
+
+    const startOffset = bin === binOrganik ? organikOffset : nonOffset;
+    const settleStart = performance.now();
+    const settleDuration = 240;
+
+    const step = (now) => {
+      const progress = Math.min(1, (now - settleStart) / settleDuration);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const value = startOffset + (targetOffset - startOffset) * eased;
+
+      if (bin === binOrganik){
+        organikOffset = value;
+        binOrganik.style.transform = `translateX(${organikOffset}px)`;
+      } else {
+        nonOffset = value;
+        binNon.style.transform = `translateX(${nonOffset}px)`;
+      }
+
+      if (progress < 1) {
+        dragRaf = requestAnimationFrame(step);
+      } else {
+        dragRaf = null;
+      }
+    };
+
+    dragRaf = requestAnimationFrame(step);
   }
 
   startOverlay.addEventListener('pointermove', (e) => {
@@ -1362,9 +1412,11 @@
     draggingBin = bin;
     draggingBin.setPointerCapture?.(e.pointerId);
     draggingBin.style.zIndex = '7';
+    draggingBin.classList.add('dragging');
     dragStartX = e.clientX;
     dragStartOffset = bin === binOrganik ? organikOffset : nonOffset;
     draggingBin.style.transition = 'none';
+    draggingBin.style.willChange = 'transform';
   }
 
   binOrganik.addEventListener('pointerdown', (e) => startBinDrag(e, binOrganik));
@@ -1373,21 +1425,30 @@
   document.addEventListener('pointermove', (e) => {
     if (!draggingBin || !gameActive) return;
     const delta = e.clientX - dragStartX;
-    const newOffset = dragStartOffset + delta;
+    const playWidth = playArea.clientWidth || game.clientWidth;
+    const minOffset = -playWidth * 0.42;
+    const maxOffset = playWidth * 0.42;
+    const rawOffset = Math.max(minOffset, Math.min(maxOffset, dragStartOffset + delta));
+    const easedOffset = dragStartOffset + (rawOffset - dragStartOffset) * 0.92;
 
     if (draggingBin === binOrganik){
-      organikOffset = newOffset;
+      organikTargetOffset = rawOffset;
+      organikOffset = easedOffset;
       binOrganik.style.transform = `translateX(${organikOffset}px)`;
     } else {
-      nonOffset = newOffset;
+      nonTargetOffset = rawOffset;
+      nonOffset = easedOffset;
       binNon.style.transform = `translateX(${nonOffset}px)`;
     }
   });
 
   document.addEventListener('pointerup', () => {
     if (!draggingBin) return;
-    draggingBin.style.transition = 'transform .25s ease-out';
+    draggingBin.style.transition = 'transform .26s cubic-bezier(.18,1,.22,1)';
+    draggingBin.classList.remove('dragging');
     draggingBin.style.zIndex = '';
+    const settleTarget = draggingBin === binOrganik ? organikTargetOffset : nonTargetOffset;
+    animateBinSettled(draggingBin, settleTarget * 0.98);
     draggingBin = null;
   });
 
