@@ -624,6 +624,133 @@
       color:#e9f4eb;
     }
 
+    .auth-panel{
+      margin:10px 0 12px;
+      padding:10px;
+      border-radius:16px;
+      background:rgba(255,255,255,.1);
+      border:1px solid rgba(255,255,255,.14);
+      text-align:left;
+    }
+
+    .auth-row{
+      display:flex;
+      gap:8px;
+    }
+
+    .auth-input{
+      width:100%;
+      border:none;
+      outline:none;
+      border-radius:12px;
+      padding:9px 10px;
+      font-size:12px;
+      font-weight:600;
+      color:#2e4434;
+      background:rgba(255,255,255,.9);
+    }
+
+    .auth-actions{
+      margin-top:8px;
+      display:flex;
+      gap:8px;
+    }
+
+    .username-hint{
+      min-height:15px;
+      margin-top:7px;
+      font-size:11px;
+      font-weight:600;
+      color:#f3ffe7;
+    }
+
+    .username-hint.error{color:#ffd5d5;}
+    .username-hint.ok{color:#d8ffe0;}
+
+    .btn.auth-btn{
+      flex:1;
+      margin-top:0;
+      padding:8px 10px;
+      font-size:12px;
+      box-shadow:0 3px 0 var(--accent-dark);
+    }
+
+    .auth-status{
+      min-height:16px;
+      margin-top:8px;
+      font-size:11px;
+      font-weight:600;
+      color:#fffbe0;
+    }
+
+    .auth-status.error{color:#ffd5d5;}
+    .auth-status.ok{color:#d8ffe0;}
+    .auth-status.info{color:#fffbe0;}
+
+    .multiplayer-panel{
+      margin:10px 0 0;
+      padding:10px;
+      border-radius:16px;
+      text-align:left;
+      background:rgba(57,96,155,.25);
+      border:1px solid rgba(210,237,255,.24);
+    }
+
+    .multiplayer-title{font-size:12px; font-weight:800; color:#eef9ff; margin-bottom:7px;}
+    .multiplayer-row{display:flex; gap:7px;}
+    .multiplayer-actions{display:flex; gap:7px; margin-top:7px;}
+    .room-input{text-transform:uppercase; letter-spacing:1px;}
+    .room-join-btn{flex:1; margin:0; padding:8px 11px; font-size:12px; white-space:nowrap; box-shadow:0 3px 0 var(--accent-dark);}
+    .room-status{min-height:16px; margin-top:7px; font-size:11px; font-weight:600; color:#e9f7ff;}
+    .room-status.error{color:#ffd5d5;}
+    .room-players{display:grid; gap:4px; margin-top:7px; max-height:92px; overflow:auto;}
+    .room-player{display:flex; align-items:center; justify-content:space-between; gap:8px; padding:5px 7px; border-radius:9px; font-size:11px; color:#f9fff0; background:rgba(255,255,255,.1);}
+    .room-player.me{border:1px solid rgba(255,245,183,.7); background:rgba(255,245,183,.15);}
+    .room-player-score{font-weight:800; white-space:nowrap;}
+
+    .ranking-panel{
+      margin-top:8px;
+      padding:8px;
+      border-radius:14px;
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.1);
+    }
+
+    .ranking-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom:6px;
+      font-size:12px;
+      font-weight:700;
+      color:#f1ffe8;
+    }
+
+    .ranking-list{
+      list-style:none;
+      margin:0;
+      padding:0;
+      max-height:102px;
+      overflow:auto;
+      display:grid;
+      gap:4px;
+    }
+
+    .ranking-item{
+      display:flex;
+      justify-content:space-between;
+      font-size:11px;
+      padding:4px 6px;
+      border-radius:8px;
+      background:rgba(255,255,255,.08);
+      color:#f9fff0;
+    }
+
+    .ranking-item.me{
+      background:rgba(255,246,200,.2);
+      border:1px solid rgba(255,246,200,.4);
+    }
+
     .opening-tips{
       display:grid;
       gap:8px;
@@ -753,10 +880,29 @@
       color:#46584b;
     }
 
+    .help-card p + p{margin-top:8px;}
+
     .help-close{
       margin-top:14px;
       width:100%;
     }
+
+    .match-results{
+      width:min(100%, 340px);
+      background:linear-gradient(180deg, #fffdf6 0%, #e8f7eb 100%);
+      color:#263529;
+      border-radius:24px;
+      padding:20px 18px;
+      text-align:left;
+      box-shadow:0 18px 50px rgba(0,0,0,.3);
+    }
+
+    .match-results h2{text-align:center; margin:0 0 6px; color:var(--organik-dark);}
+    .match-results p{text-align:center; margin:0 0 14px; color:#526557; font-size:13px;}
+    .match-result-list{list-style:none; padding:0; margin:0; display:grid; gap:7px;}
+    .match-result-item{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:9px 10px; border-radius:12px; background:rgba(255,255,255,.75); font-size:13px; font-weight:700;}
+    .match-result-item.me{background:#fff1bd; outline:1px solid #eabf47;}
+    .match-result-rank{min-width:32px; color:#8a6318;}
 
     .btn.sound-off{
       background:#d7e7d6;
@@ -788,6 +934,13 @@
     .btn:active{
       transform:translateY(2px);
       box-shadow:0 2px 0 var(--accent-dark);
+    }
+
+    .btn:disabled{
+      opacity:.7;
+      cursor:not-allowed;
+      transform:none;
+      box-shadow:0 2px 0 rgba(0,0,0,.18);
     }
 
     @media (max-width:480px){
@@ -904,9 +1057,25 @@
       <h2 class="opening-title">Pilah <span>Yuk!</span></h2>
       <p class="opening-desc">Tangkap sampah yang jatuh dan pilah ke tempat yang benar sebelum habis nyawa kamu.</p>
       <div class="opening-tips">
-        <div class="opening-tip">🗑️ Geser tong sampah ke kiri atau kanan.</div>
-        <div class="opening-tip">🍌 Organik ke tong hijau, non-organik ke tong biru.</div>
         <div class="opening-tip">❤️ Salah 3 kali, permainan selesai.</div>
+      </div>
+      <div class="auth-panel">
+        <div class="auth-row">
+          <input id="usernameInput" class="auth-input" type="text" maxlength="16" placeholder="nama panggilan (opsional)" autocomplete="nickname" />
+        </div>
+        <div id="authStatus" class="auth-status info">Mode tamu aktif. Login tidak diperlukan.</div>
+      </div>
+      <div class="multiplayer-panel">
+        <div class="multiplayer-title">👥 Multiplayer — main bareng teman</div>
+        <div class="multiplayer-row">
+          <input id="roomCodeInput" class="auth-input room-input" type="text" maxlength="6" placeholder="kode room" autocomplete="off" />
+        </div>
+        <div class="multiplayer-actions">
+          <button class="btn room-join-btn" id="createRoomBtn" type="button">Buat Room</button>
+          <button class="btn room-join-btn" id="joinRoomBtn" type="button">Gabung Room</button>
+        </div>
+        <div id="roomStatus" class="room-status">Isi kode yang sama dengan teman, lalu gabung.</div>
+        <div id="roomPlayers" class="room-players" hidden></div>
       </div>
       <div class="opening-actions">
         <button class="btn small-btn" id="howToPlayBtn" type="button">How to Play</button>
@@ -919,7 +1088,8 @@
   <div class="help-modal" id="helpModal" hidden>
     <div class="help-card">
       <h3>How to Play</h3>
-      <p>Geser dua tong sampah ke kiri atau kanan untuk menangkap sampah yang jatuh. Sampah organik harus masuk ke tong hijau, sampah non-organik ke tong biru. Kalau salah atau telat, nyawa kamu berkurang.</p>
+      <p>Geser dua tong sampah ke kiri atau kanan untuk menangkap sampah yang jatuh.</p>
+      <p>Masukkan sampah organik ke tong hijau dan sampah non-organik ke tong biru. Kalau salah atau telat, nyawa kamu berkurang.</p>
       <button class="btn help-close" id="closeHelpBtn" type="button">OK</button>
     </div>
   </div>
@@ -961,6 +1131,20 @@
   const soundToggleBtn = document.getElementById('soundToggleBtn');
   const helpModal = document.getElementById('helpModal');
   const closeHelpBtn = document.getElementById('closeHelpBtn');
+  const usernameInput = document.getElementById('usernameInput');
+  const passwordInput = document.getElementById('passwordInput');
+  const registerBtn = document.getElementById('registerBtn');
+  const loginBtn = document.getElementById('loginBtn');
+  const logoutBtn = document.getElementById('logoutBtn');
+  const authStatus = document.getElementById('authStatus');
+  const usernameHint = document.getElementById('usernameHint');
+  const rankingList = document.getElementById('rankingList');
+  const refreshRankingBtn = document.getElementById('refreshRankingBtn');
+  const roomCodeInput = document.getElementById('roomCodeInput');
+  const createRoomBtn = document.getElementById('createRoomBtn');
+  const joinRoomBtn = document.getElementById('joinRoomBtn');
+  const roomStatus = document.getElementById('roomStatus');
+  const roomPlayers = document.getElementById('roomPlayers');
 
   let score = 0;
   let lives = 3;
@@ -971,6 +1155,7 @@
   const BASE_SPAWN_RATE = 3300;
   const MIN_DROP_TIME = 2200;
   const MIN_SPAWN_RATE = 1300;
+  const BASE_WAVE_GAP = 260;
   let dropTime = BASE_DROP_TIME;
   let spawnRate = BASE_SPAWN_RATE;
   let dropInterval;
@@ -986,6 +1171,16 @@
   let startingGame = false;
   let parallaxX = 0;
   let parallaxY = 0;
+  let authToken = localStorage.getItem('pilah_token') || '';
+  let currentUser = null;
+  let usernameCheckTimer = null;
+  let usernameCheckSeq = 0;
+  let usernameAvailable = false;
+  let multiplayerSocket = null;
+  let multiplayerRoom = null;
+  let multiplayerPlayerId = null;
+  let multiplayerStartTimer = null;
+  let multiplayerStarting = false;
 
   // Audio context & sound effects
   let audioContext;
@@ -1120,6 +1315,22 @@
     setTimeout(() => playSound(783.99, 0.16, 'triangle', 0.22), 90);
   };
 
+  const soundButtonClick = () => {
+    if (!soundEnabled) return;
+    if (!audioContext) initAudio();
+
+    const playClick = () => {
+      playSound(165, 0.07, 'triangle', 0.16);
+      setTimeout(() => playSound(220, 0.06, 'triangle', 0.12), 45);
+    };
+
+    if (audioContext.state === 'suspended') {
+      audioContext.resume().then(playClick).catch(() => {});
+    } else {
+      playClick();
+    }
+  };
+
   function showFeedback(text, type, x, y){
     const tag = document.createElement('div');
     tag.className = `feedback-float ${type}`;
@@ -1128,6 +1339,371 @@
     tag.style.top = `${y}px`;
     game.appendChild(tag);
     setTimeout(() => tag.remove(), 820);
+  }
+
+  async function apiRequest(url, options = {}) {
+    const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };
+    if (authToken) {
+      headers.Authorization = `Bearer ${authToken}`;
+    }
+    const response = await fetch(url, { ...options, headers });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(payload.error || 'Permintaan gagal');
+    }
+    return payload;
+  }
+
+  function setAuthMessage(text, kind = '') {
+    if (!authStatus) return;
+    authStatus.textContent = text;
+    authStatus.classList.remove('error', 'ok', 'info');
+    if (kind) authStatus.classList.add(kind);
+  }
+
+  function setRoomStatus(text, kind = '') {
+    roomStatus.textContent = text;
+    roomStatus.classList.toggle('error', kind === 'error');
+  }
+
+  function renderRoom(room) {
+    multiplayerRoom = room;
+    const players = room?.players || [];
+    roomPlayers.hidden = players.length === 0;
+    roomPlayers.innerHTML = players.map((player) => {
+      const isMe = player.id === multiplayerPlayerId;
+      const state = player.status === 'finished' ? 'Selesai' : player.status === 'playing' ? 'Main' : 'Siap';
+      return `<div class="room-player ${isMe ? 'me' : ''}"><span>${isMe ? 'Kamu' : player.name} · ${state}</span><span class="room-player-score">⭐ ${player.score}</span></div>`;
+    }).join('');
+
+    if (room.finished) {
+      setRoomStatus('Pertandingan selesai. Lihat hasil akhir!');
+    } else if (room.started) {
+      setRoomStatus('Pertandingan dimulai! Kejar skor temanmu.');
+      scheduleMultiplayerStart(room.startAt);
+    } else {
+      setRoomStatus(`${players.length}/4 pemain di room ${room.code}. Tekan Start untuk mulai bersama.`);
+    }
+  }
+
+  function showMultiplayerWaiting() {
+    document.getElementById('gameOverOverlay')?.remove();
+    const overlay = document.createElement('div');
+    overlay.className = 'overlay';
+    overlay.id = 'gameOverOverlay';
+    overlay.innerHTML = '<h2>Kamu selesai! 🏁</h2><p>Menunggu semua pemain menyelesaikan permainan untuk menampilkan hasil akhir.</p>';
+    game.appendChild(overlay);
+  }
+
+  function showMultiplayerResults(results) {
+    document.getElementById('gameOverOverlay')?.remove();
+    const overlay = document.createElement('div');
+    overlay.className = 'overlay';
+    overlay.id = 'gameOverOverlay';
+    const rows = results.map((player) => `
+      <li class="match-result-item ${player.id === multiplayerPlayerId ? 'me' : ''}">
+        <span class="match-result-rank">#${player.rank}</span>
+        <span>${player.name}${player.id === multiplayerPlayerId ? ' (Kamu)' : ''}</span>
+        <strong>⭐ ${player.score}</strong>
+      </li>`).join('');
+    overlay.innerHTML = `
+      <div class="match-results">
+        <h2>Hasil Pertandingan</h2>
+        <p>Semua pemain telah selesai.</p>
+        <ol class="match-result-list">${rows}</ol>
+      </div>`;
+    game.appendChild(overlay);
+  }
+
+  function scheduleMultiplayerStart(startAt) {
+    if (gameActive || !startAt) return;
+    multiplayerStarting = true;
+    startBtn.disabled = true;
+    startBtn.textContent = 'Menunggu mulai...';
+    const delay = Math.max(0, startAt - Date.now());
+    clearTimeout(multiplayerStartTimer);
+    multiplayerStartTimer = setTimeout(() => {
+      multiplayerStarting = false;
+      closeOpeningAndStart();
+    }, delay);
+  }
+
+  function sendPlayerUpdate(status = gameActive ? 'playing' : 'finished') {
+    if (!multiplayerSocket || multiplayerSocket.readyState !== WebSocket.OPEN || !multiplayerRoom?.started) return;
+    multiplayerSocket.send(JSON.stringify({ type: 'player:update', score, lives, status }));
+  }
+
+  function connectToRoom(create = false) {
+    const roomCode = roomCodeInput.value.trim().toUpperCase();
+    const playerName = (usernameInput.value.trim() || localStorage.getItem('pilah_guest_name') || 'Pemain').slice(0, 18);
+    if (!create && !roomCode) { setRoomStatus('Masukkan kode room dulu ya.', 'error'); return; }
+    if (multiplayerSocket?.readyState === WebSocket.OPEN) multiplayerSocket.close();
+    setRoomStatus(create ? 'Membuat room baru...' : 'Menghubungkan ke room...');
+    joinRoomBtn.disabled = true;
+    createRoomBtn.disabled = true;
+    const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+    multiplayerSocket = new WebSocket(`${protocol}//${location.host}/ws`);
+    multiplayerSocket.addEventListener('open', () => {
+      multiplayerSocket.send(JSON.stringify({ type: create ? 'room:create' : 'room:join', roomCode, playerName }));
+    });
+    multiplayerSocket.addEventListener('message', (event) => {
+      const message = JSON.parse(event.data);
+      if (message.type === 'room:joined') multiplayerPlayerId = message.playerId;
+      if (message.type === 'room:joined' || message.type === 'room:update') {
+        renderRoom(message.room);
+        if (message.type === 'room:joined') {
+          roomCodeInput.value = message.room.code;
+          if (create) setRoomStatus(`Room ${message.room.code} berhasil dibuat. Bagikan kode ini ke temanmu.`);
+        }
+      }
+      if (message.type === 'room:finished') {
+        renderRoom(message.room);
+        showMultiplayerResults(message.results);
+      }
+      if (message.type === 'error') setRoomStatus(message.message, 'error');
+    });
+    multiplayerSocket.addEventListener('close', () => {
+      if (!gameActive) setRoomStatus('Koneksi room terputus. Coba gabung lagi.', 'error');
+      joinRoomBtn.disabled = false;
+      createRoomBtn.disabled = false;
+    });
+    multiplayerSocket.addEventListener('error', () => setRoomStatus('Server multiplayer belum terhubung. Jalankan server game.', 'error'));
+  }
+
+  function setUsernameHint(text, kind = '') {
+    if (!usernameHint) return;
+    usernameHint.textContent = text;
+    usernameHint.classList.remove('error', 'ok');
+    if (kind) usernameHint.classList.add(kind);
+  }
+
+  function mapAuthErrorMessage(rawMessage, mode = 'login') {
+    const message = String(rawMessage || '').toLowerCase();
+
+    if (message.includes('username sudah dipakai')) {
+      return 'Nama pemain itu sudah dipakai teman lain. Coba nama lain ya.';
+    }
+    if (message.includes('username atau password salah')) {
+      return 'Ups, nama pemain atau kata sandinya belum cocok. Coba lagi ya.';
+    }
+    if (message.includes('belum login')) {
+      return 'Kamu belum login. Yuk masuk dulu.';
+    }
+    if (message.includes('session habis')) {
+      return 'Sesi kamu sudah habis. Login lagi ya.';
+    }
+    if (message.includes('username harus 3-16')) {
+      return 'Nama pemain perlu 3 sampai 16 huruf.';
+    }
+    if (message.includes('huruf kecil, angka, underscore')) {
+      return 'Nama pemain boleh huruf kecil, angka, dan garis bawah.';
+    }
+    if (message.includes('password harus 4-40')) {
+      return 'Kata sandi perlu 4 sampai 40 karakter.';
+    }
+    if (mode === 'register') {
+      return 'Ups, akun belum berhasil dibuat. Coba lagi pelan-pelan ya.';
+    }
+    return 'Ups, login belum berhasil. Coba lagi ya.';
+  }
+
+  function validateUsernameRules(username) {
+    if (!username) {
+      return { ok: false, reason: 'empty', text: 'Yuk isi nama pemain dulu.' };
+    }
+    if (username.length < 3 || username.length > 16) {
+      return { ok: false, reason: 'length', text: 'Nama pemain perlu 3 sampai 16 huruf.' };
+    }
+    if (!/^[a-z0-9_]+$/.test(username)) {
+      return { ok: false, reason: 'format', text: 'Pakai huruf kecil, angka, atau garis bawah ya.' };
+    }
+    return { ok: true, reason: 'ok', text: 'Nama pemain terlihat bagus. Cek ketersediaan...' };
+  }
+
+  async function checkUsernameAvailability() {
+    const username = usernameInput.value.trim().toLowerCase();
+    const validation = validateUsernameRules(username);
+
+    if (!validation.ok) {
+      usernameAvailable = false;
+      setUsernameHint(validation.text, 'error');
+      updateAuthControls();
+      return false;
+    }
+
+    const checkId = ++usernameCheckSeq;
+    setUsernameHint('Memeriksa nama pemain...', '');
+
+    try {
+      const data = await apiRequest(`/api/username-check?username=${encodeURIComponent(username)}`, { method: 'GET' });
+      if (checkId !== usernameCheckSeq) return false;
+
+      usernameAvailable = Boolean(data.available);
+      if (usernameAvailable) {
+        setUsernameHint('Yeay, nama pemain ini bisa dipakai!', 'ok');
+      } else if (data.reason === 'taken') {
+        setUsernameHint('Nama pemain ini sudah dipakai. Coba yang lain ya.', 'error');
+      } else if (data.reason === 'length') {
+        setUsernameHint('Nama pemain perlu 3 sampai 16 huruf.', 'error');
+      } else if (data.reason === 'format') {
+        setUsernameHint('Pakai huruf kecil, angka, atau garis bawah ya.', 'error');
+      } else {
+        setUsernameHint('Yuk isi nama pemain dulu.', 'error');
+      }
+    } catch {
+      usernameAvailable = false;
+      if (checkId !== usernameCheckSeq) return false;
+      setUsernameHint('Belum bisa cek nama pemain sekarang. Coba sebentar lagi ya.', 'error');
+    }
+
+    updateAuthControls();
+    return usernameAvailable;
+  }
+
+  function updateAuthControls() {
+    const hasUser = Boolean(currentUser);
+    if (logoutBtn) logoutBtn.disabled = !hasUser;
+    if (registerBtn) registerBtn.disabled = hasUser;
+  }
+
+  function updateStartButtonState() {
+    startBtn.disabled = false;
+    if (!startingGame) {
+      startBtn.textContent = 'Start';
+    }
+    updateAuthControls();
+  }
+
+  async function refreshRanking() {
+    if (!rankingList) return;
+    try {
+      const data = await apiRequest('/api/ranking?limit=10', { method: 'GET' });
+      rankingList.innerHTML = '';
+
+      if (!data.ranking || data.ranking.length === 0) {
+        const emptyItem = document.createElement('li');
+        emptyItem.className = 'ranking-item';
+        emptyItem.textContent = 'Belum ada skor.';
+        rankingList.appendChild(emptyItem);
+        return;
+      }
+
+      data.ranking.forEach((item) => {
+        const row = document.createElement('li');
+        row.className = 'ranking-item';
+        if (currentUser && item.username === currentUser.username) {
+          row.classList.add('me');
+        }
+        row.innerHTML = `<span>#${item.rank} ${item.username}</span><strong>${item.bestScore}</strong>`;
+        rankingList.appendChild(row);
+      });
+    } catch {
+      rankingList.innerHTML = '<li class="ranking-item">Gagal memuat ranking.</li>';
+    }
+  }
+
+  async function restoreSession() {
+    if (!authToken) {
+      updateStartButtonState();
+      await refreshRanking();
+      return;
+    }
+
+    try {
+      const data = await apiRequest('/api/me', { method: 'GET' });
+      currentUser = data.user;
+      setAuthMessage(`Halo ${currentUser.username}! Kamu siap main.`, 'ok');
+      setUsernameHint('Kamu sudah login. Kalau mau ganti akun, klik Logout.', 'ok');
+    } catch {
+      authToken = '';
+      currentUser = null;
+      localStorage.removeItem('pilah_token');
+      setAuthMessage('Sesi login habis. Yuk masuk lagi.', 'error');
+      setUsernameHint('Pakai nama pemain unik ya, biar gampang dicari di ranking.', '');
+    }
+
+    updateStartButtonState();
+    await refreshRanking();
+  }
+
+  async function auth(mode) {
+    const username = usernameInput.value.trim().toLowerCase();
+    const password = passwordInput.value;
+    if (!username || !password) {
+      setAuthMessage('Yuk isi nama pemain dan kata sandi dulu.', 'error');
+      return;
+    }
+
+    const usernameValidation = validateUsernameRules(username);
+    if (!usernameValidation.ok) {
+      setUsernameHint(usernameValidation.text, 'error');
+      if (mode === 'register') {
+        setAuthMessage(usernameValidation.text, 'error');
+        return;
+      }
+    }
+
+    if (mode === 'register') {
+      const available = await checkUsernameAvailability();
+      if (!available) {
+        setAuthMessage('Nama pemain belum bisa dipakai. Coba nama lain ya.', 'error');
+        return;
+      }
+    }
+
+    try {
+      setAuthMessage(mode === 'register' ? 'Membuat akun kamu...' : 'Sedang login...', 'info');
+      const endpoint = mode === 'register' ? '/api/register' : '/api/login';
+      const data = await apiRequest(endpoint, {
+        method: 'POST',
+        body: JSON.stringify({ username, password }),
+      });
+
+      authToken = data.token;
+      currentUser = data.user;
+      localStorage.setItem('pilah_token', authToken);
+      setAuthMessage(`Siap, ${currentUser.username}! Selamat bermain.`, 'ok');
+      setUsernameHint('Kamu sudah login. Kalau mau ganti akun, klik Logout.', 'ok');
+      passwordInput.value = '';
+      updateStartButtonState();
+      await refreshRanking();
+    } catch (error) {
+      setAuthMessage(mapAuthErrorMessage(error.message, mode), 'error');
+    }
+  }
+
+  async function logout() {
+    if (!authToken && !currentUser) return;
+    try {
+      if (authToken) {
+        await apiRequest('/api/logout', { method: 'POST' });
+      }
+    } catch {
+      // Logout should still clear local session even if request fails.
+    }
+
+    authToken = '';
+    currentUser = null;
+    localStorage.removeItem('pilah_token');
+    passwordInput.value = '';
+    setAuthMessage('Kamu berhasil logout. Sampai ketemu lagi!', 'ok');
+    setUsernameHint('Pakai nama pemain unik ya, biar gampang dicari di ranking.', '');
+    updateStartButtonState();
+    await refreshRanking();
+  }
+
+  async function submitScore(scoreValue) {
+    if (!currentUser || !authToken) return;
+    try {
+      const data = await apiRequest('/api/score', {
+        method: 'POST',
+        body: JSON.stringify({ score: scoreValue }),
+      });
+      currentUser = data.user;
+      await refreshRanking();
+    } catch {
+      // Keep game flow smooth if score sync fails.
+    }
   }
 
   function setSoundEnabled(enabled){
@@ -1248,17 +1824,55 @@
     return Math.min(1 + Math.floor((level - 1) / 2), 5);
   }
 
+  function collectBlockedSpawnLefts(playAreaRect){
+    const activeItems = [...playArea.querySelectorAll('.falling-item[data-state="falling"]')];
+    return activeItems
+      .map((activeItem) => {
+        const rect = activeItem.getBoundingClientRect();
+        const isNearTop = rect.top - playAreaRect.top < playAreaRect.height * 0.4;
+        if (!isNearTop) return null;
+        return rect.left - playAreaRect.left;
+      })
+      .filter((left) => typeof left === 'number');
+  }
+
+  function pickSpawnLeft(itemWidth, reservedLefts = []){
+    const playAreaRect = playArea.getBoundingClientRect();
+    const areaWidth = playArea.clientWidth;
+    const minLeft = 8;
+    const maxLeft = Math.max(minLeft, areaWidth - itemWidth - 8);
+    const minGap = Math.min(118, Math.max(82, areaWidth * 0.22));
+    const blockedLefts = [...reservedLefts, ...collectBlockedSpawnLefts(playAreaRect)];
+
+    let chosenLeft = minLeft + Math.random() * (maxLeft - minLeft);
+    for (let attempt = 0; attempt < 18; attempt++) {
+      const candidateLeft = minLeft + Math.random() * (maxLeft - minLeft);
+      const hasGap = blockedLefts.every((blockedLeft) => Math.abs(candidateLeft - blockedLeft) >= minGap);
+      if (hasGap) {
+        chosenLeft = candidateLeft;
+        break;
+      }
+      if (attempt === 17) {
+        chosenLeft = candidateLeft;
+      }
+    }
+
+    reservedLefts.push(chosenLeft);
+    return chosenLeft;
+  }
+
   function spawnWave(){
     if (!gameActive) return;
     const itemsPerWave = getItemsPerWave();
+    const reservedLefts = [];
     for (let i = 0; i < itemsPerWave; i++){
       setTimeout(() => {
-        if (gameActive) spawnItem();
-      }, i * 180);
+        if (gameActive) spawnItem(reservedLefts);
+      }, i * BASE_WAVE_GAP);
     }
   }
 
-  function spawnItem(){
+  function spawnItem(reservedLefts = []){
     if (!gameActive) return;
 
     const data = pickRandom();
@@ -1268,14 +1882,12 @@
     item.dataset.type = data.type;
     playArea.appendChild(item);
 
-    const areaWidth = playArea.clientWidth;
     const itemWidth = item.offsetWidth || 85;
-    const minLeft = 8;
-    const maxLeft = Math.max(minLeft, areaWidth - itemWidth - 8);
-    const randomLeft = minLeft + Math.random() * (maxLeft - minLeft);
+  const randomLeft = pickSpawnLeft(itemWidth, reservedLefts);
     item.style.left = `${randomLeft}px`;
     item.style.transform = 'none';
     item.dataset.state = 'falling';
+  item.dataset.spawnLeft = `${randomLeft}`;
     
     item.style.animationDuration = dropTime + 'ms';
 
@@ -1331,6 +1943,7 @@
     correctCount++;
     updateLevelByProgress();
     scoreEl.textContent = score;
+    sendPlayerUpdate();
     soundCorrect();
     const r = bin.getBoundingClientRect();
     const areaRect = game.getBoundingClientRect();
@@ -1349,6 +1962,7 @@
   function handleWrong(bin, item){
     lives--;
     updateLives();
+    sendPlayerUpdate(lives <= 0 ? 'finished' : 'playing');
     soundWrong();
     const r = bin.getBoundingClientRect();
     const areaRect = game.getBoundingClientRect();
@@ -1367,6 +1981,7 @@
   function handleMiss(item){
     lives--;
     updateLives();
+    sendPlayerUpdate(lives <= 0 ? 'finished' : 'playing');
     soundMiss();
     showFeedback('TETOD 😵', 'bad', game.clientWidth / 2, game.clientHeight * 0.35);
     if (lives <= 0) endGame();
@@ -1409,8 +2024,15 @@
     clearInterval(dropInterval);
     stopBgm();
     soundGameOver();
+    submitScore(score);
+    sendPlayerUpdate('finished');
+    if (multiplayerRoom?.started && !multiplayerRoom.finished) {
+      showMultiplayerWaiting();
+      return;
+    }
     const overlay = document.createElement('div');
     overlay.className = 'overlay';
+    overlay.id = 'gameOverOverlay';
     overlay.innerHTML = `
       <h2>Game Over 😢</h2>
       <p>Skor akhir kamu: <strong>${score}</strong></p>
@@ -1439,6 +2061,7 @@
     playArea.innerHTML = '';
     applyDifficulty();
     gameActive = true;
+    sendPlayerUpdate('playing');
     clearInterval(dropInterval);
     dropInterval = setInterval(spawnWave, spawnRate);
     startBgm();
@@ -1493,7 +2116,25 @@
 
   startBtn.addEventListener('click', () => {
     initAudio();
+    if (multiplayerRoom && !multiplayerRoom.started) {
+      if (multiplayerSocket?.readyState === WebSocket.OPEN) {
+        multiplayerStarting = true;
+        startBtn.disabled = true;
+        startBtn.textContent = 'Menunggu pemain...';
+        multiplayerSocket.send(JSON.stringify({ type: 'room:start' }));
+      }
+      return;
+    }
     closeOpeningAndStart();
+  });
+
+  createRoomBtn.addEventListener('click', () => connectToRoom(true));
+  joinRoomBtn.addEventListener('click', () => connectToRoom());
+  roomCodeInput.addEventListener('input', () => {
+    roomCodeInput.value = roomCodeInput.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+  });
+  roomCodeInput.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') connectToRoom();
   });
 
   howToPlayBtn.addEventListener('click', () => {
@@ -1514,6 +2155,57 @@
       audioContext.resume();
     }
   });
+
+  // Berlaku juga untuk tombol yang dibuat dinamis, misalnya "Main Lagi".
+  document.addEventListener('click', (event) => {
+    const button = event.target.closest('button');
+    if (!button || button.disabled) return;
+    soundButtonClick();
+  }, true);
+
+  registerBtn?.addEventListener('click', () => auth('register'));
+  loginBtn?.addEventListener('click', () => auth('login'));
+  logoutBtn?.addEventListener('click', logout);
+  refreshRankingBtn?.addEventListener('click', refreshRanking);
+
+  usernameInput?.addEventListener('input', () => {
+    const cleaned = usernameInput.value.toLowerCase().replace(/\s+/g, '');
+    if (cleaned !== usernameInput.value) {
+      usernameInput.value = cleaned;
+    }
+
+    usernameAvailable = false;
+    if (usernameCheckTimer) {
+      clearTimeout(usernameCheckTimer);
+    }
+
+    const validation = validateUsernameRules(cleaned.trim());
+    if (!validation.ok) {
+      setUsernameHint(validation.text, 'error');
+      updateAuthControls();
+      return;
+    }
+
+    if (usernameHint) {
+      setUsernameHint('Nama panggilan siap dipakai.', 'ok');
+    }
+
+    localStorage.setItem('pilah_guest_name', cleaned.trim());
+  });
+
+  passwordInput?.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+      auth('login');
+    }
+  });
+
+  const savedGuestName = localStorage.getItem('pilah_guest_name') || '';
+  if (savedGuestName && usernameInput) {
+    usernameInput.value = savedGuestName;
+  }
+  currentUser = { username: savedGuestName || 'tamu' };
+  setAuthMessage('Mode tamu aktif. Login tidak diperlukan.', 'info');
+  updateStartButtonState();
 
 })();
 </script>
