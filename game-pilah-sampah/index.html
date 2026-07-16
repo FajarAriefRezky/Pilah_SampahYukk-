@@ -710,8 +710,10 @@
     .gas-mabar-btn{width:100%; margin-top:10px; background:#82c8ff; color:#173d62; box-shadow:0 4px 0 #4f91c8;}
     .mabar-card{position:relative; width:min(100%, 350px); max-height:90vh; overflow:auto; background:linear-gradient(180deg, #f5fbff 0%, #e4f3ff 100%); color:#213744; border-radius:24px; padding:18px 16px; box-shadow:0 18px 50px rgba(0,0,0,.32);}
     .mabar-card h3{margin:0 0 5px; font-family:'Baloo 2', sans-serif; font-size:25px; text-align:center; color:#28507a;}
+    .mabar-card.in-lobby{width:min(100%, 410px);}
     .mabar-desc{margin:0 0 12px; text-align:center; font-size:12px; color:#526d7d;}
     .player-slots{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:10px 0;}
+    .player-slots[hidden]{display:none;}
     .player-slot{border:2px solid #c2dceb; border-radius:14px; padding:9px; background:#fff; color:#345; cursor:pointer; text-align:left; font:700 12px 'Poppins', sans-serif;}
     .player-slot.selected{border-color:#3a6ea5; background:#ddecff;}
     .player-slot.occupied{opacity:.65; cursor:not-allowed; background:#e7edf1;}
@@ -719,6 +721,27 @@
     .mabar-actions{display:flex; gap:8px; margin-top:10px;}
     .mabar-actions .btn{flex:1; margin:0; padding:10px 8px; font-size:13px;}
     .mabar-back{position:absolute; top:11px; left:11px; width:32px; height:32px; padding:0; border-radius:50%; font-size:20px; line-height:1; box-shadow:0 2px 0 var(--accent-dark);}
+    .mabar-step[hidden]{display:none;}
+    .character-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:14px 0;}
+    .character-card{border:2px solid #c2dceb; border-radius:18px; padding:12px 8px; background:#fff; color:#345; cursor:pointer; text-align:center; font:800 12px 'Poppins',sans-serif; transition:.18s transform,.18s border-color,.18s background;}
+    .character-card:hover{transform:translateY(-2px); border-color:#79aeda;}
+    .character-card.selected{border-color:#3a6ea5; background:#ddecff; box-shadow:0 4px 0 #aacbe5;}
+    .character-emoji{display:block; font-size:42px; line-height:1.15; margin-bottom:5px;}
+    .lobby-code{margin:12px 0; padding:12px; border:2px dashed #88b6d6; border-radius:16px; text-align:center; background:#fff;}
+    .lobby-code small{display:block; color:#66808f; font-weight:700;}
+    .lobby-code strong{display:block; margin-top:2px; color:#28507a; font-size:27px; letter-spacing:5px;}
+    .copy-room-btn{display:block; width:100%; margin:0 0 10px; padding:9px 12px; font-size:12px; background:#ddecff; color:#28507a; box-shadow:0 3px 0 #aacbe5;}
+    .copy-room-btn.copied{background:#dff6df; color:#28623a; box-shadow:0 3px 0 #a8d4ae;}
+    .lobby-waiting{text-align:center; color:#526d7d; font-size:12px; font-weight:700;}
+    .waiting-dots::after{content:'...'; display:inline-block; width:18px; overflow:hidden; vertical-align:bottom; animation:waitingDots 1.2s steps(4,end) infinite;}
+    @keyframes waitingDots{0%{width:0}100%{width:18px}}
+    .room-player-character{font-size:24px; margin-right:7px; vertical-align:middle;}
+    .lobby-role{width:max-content; margin:0 auto 8px; padding:5px 11px; border-radius:999px; background:#fff2bf; color:#785515; font-size:11px; font-weight:800;}
+    .lobby-role.guest{background:#ddecff; color:#28507a;}
+    #lobbyStep .room-players{grid-template-columns:1fr 1fr; max-height:none; margin:12px 0;}
+    #lobbyStep .room-player{min-height:58px; padding:8px; background:#fff; color:#344657; border:2px solid #c9dfed;}
+    #lobbyStep .room-player.empty{opacity:.72; border-style:dashed;}
+    #lobbyStep .room-player.me{border-color:#4b78ad; background:#ddecff;}
 
     .ranking-panel{
       margin-top:8px;
@@ -1094,22 +1117,43 @@
   <div class="help-modal" id="mabarModal" hidden>
     <div class="mabar-card">
       <button class="btn mabar-back" id="closeMabarBtn" type="button" aria-label="Kembali ke menu utama" title="Kembali">←</button>
+      <div class="mabar-step" id="roomSetupStep">
       <h3>🎮 Gas Mabar</h3>
-      <p class="mabar-desc">Isi nama, pilih slot Player 1–4, lalu buat atau gabung room.</p>
+      <p class="mabar-desc">Isi nama, lalu buat room baru atau masukkan kode dari teman.</p>
       <input id="mabarNameInput" class="auth-input" type="text" maxlength="18" placeholder="nama pemain wajib diisi" autocomplete="nickname" />
-      <div class="player-slots" id="playerSlots">
-        <button class="player-slot" type="button" data-slot="1">Player 1<small>Kosong</small></button>
-        <button class="player-slot" type="button" data-slot="2">Player 2<small>Kosong</small></button>
-        <button class="player-slot" type="button" data-slot="3">Player 3<small>Kosong</small></button>
-        <button class="player-slot" type="button" data-slot="4">Player 4<small>Kosong</small></button>
-      </div>
       <input id="roomCodeInput" class="auth-input room-input" type="text" maxlength="6" placeholder="kode room (untuk gabung)" autocomplete="off" />
       <div class="mabar-actions">
         <button class="btn" id="createRoomBtn" type="button">Buat Room</button>
         <button class="btn" id="joinRoomBtn" type="button">Gabung Room</button>
       </div>
-      <div id="roomStatus" class="room-status">Pilih slot sebelum mulai.</div>
-      <div id="roomPlayers" class="room-players" hidden></div>
+      <div id="roomStatus" class="room-status">Siap mabar bersama teman!</div>
+      </div>
+      <div class="mabar-step" id="characterStep" hidden>
+        <h3>Pilih Karaktermu</h3>
+        <p class="mabar-desc">Pilih satu karakter lucu sebelum masuk ke ruang tunggu.</p>
+        <div class="character-grid" id="characterGrid">
+          <button class="character-card" type="button" data-slot="1" data-character="🐼"><span class="character-emoji">🐼</span>Piko Panda</button>
+          <button class="character-card" type="button" data-slot="2" data-character="🐰"><span class="character-emoji">🐰</span>Bubu Kelinci</button>
+          <button class="character-card" type="button" data-slot="3" data-character="🦊"><span class="character-emoji">🦊</span>Fufu Rubah</button>
+          <button class="character-card" type="button" data-slot="4" data-character="🐸"><span class="character-emoji">🐸</span>Koko Katak</button>
+        </div>
+        <div class="mabar-actions"><button class="btn" id="characterBackBtn" type="button">Kembali</button><button class="btn" id="confirmCharacterBtn" type="button" disabled>Masuk Lobby</button></div>
+      </div>
+      <div class="mabar-step" id="lobbyStep" hidden>
+        <h3>Ruang Tunggu</h3>
+        <div class="lobby-role" id="lobbyRole">👑 Kamu Host</div>
+        <div class="lobby-code"><small>KODE ROOM</small><strong id="lobbyRoomCode">------</strong></div>
+        <button class="btn copy-room-btn" id="copyRoomCodeBtn" type="button">📋 Salin Kode Undangan</button>
+        <p class="lobby-waiting" id="lobbyWaitingText">Menunggu pemain lain<span class="waiting-dots"></span></p>
+        <div id="roomPlayers" class="room-players"></div>
+        <div class="mabar-actions"><button class="btn" id="leaveLobbyBtn" type="button">Keluar</button><button class="btn" id="lobbyStartBtn" type="button">Mulai Game</button></div>
+      </div>
+      <div class="player-slots" id="playerSlots" hidden>
+        <button class="player-slot" type="button" data-slot="1">Player 1<small>Kosong</small></button>
+        <button class="player-slot" type="button" data-slot="2">Player 2<small>Kosong</small></button>
+        <button class="player-slot" type="button" data-slot="3">Player 3<small>Kosong</small></button>
+        <button class="player-slot" type="button" data-slot="4">Player 4<small>Kosong</small></button>
+      </div>
     </div>
   </div>
 </div>
@@ -1169,6 +1213,18 @@
   const joinRoomBtn = document.getElementById('joinRoomBtn');
   const roomStatus = document.getElementById('roomStatus');
   const roomPlayers = document.getElementById('roomPlayers');
+  const roomSetupStep = document.getElementById('roomSetupStep');
+  const characterStep = document.getElementById('characterStep');
+  const lobbyStep = document.getElementById('lobbyStep');
+  const characterGrid = document.getElementById('characterGrid');
+  const characterBackBtn = document.getElementById('characterBackBtn');
+  const confirmCharacterBtn = document.getElementById('confirmCharacterBtn');
+  const lobbyRoomCode = document.getElementById('lobbyRoomCode');
+  const copyRoomCodeBtn = document.getElementById('copyRoomCodeBtn');
+  const lobbyRole = document.getElementById('lobbyRole');
+  const lobbyWaitingText = document.getElementById('lobbyWaitingText');
+  const leaveLobbyBtn = document.getElementById('leaveLobbyBtn');
+  const lobbyStartBtn = document.getElementById('lobbyStartBtn');
 
   let score = 0;
   let lives = 3;
@@ -1206,6 +1262,40 @@
   let multiplayerStartTimer = null;
   let multiplayerStarting = false;
   let selectedPlayerSlot = null;
+  let selectedCharacter = '';
+  let pendingRoomCreate = false;
+  let intentionalRoomClose = false;
+
+  function showMabarStep(step) {
+    roomSetupStep.hidden = step !== 'setup';
+    characterStep.hidden = step !== 'character';
+    lobbyStep.hidden = step !== 'lobby';
+    closeMabarBtn.hidden = step === 'lobby';
+    mabarModal.querySelector('.mabar-card')?.classList.toggle('in-lobby', step === 'lobby');
+  }
+
+  async function copyRoomCode() {
+    const code = multiplayerRoom?.code || lobbyRoomCode.textContent.trim();
+    if (!code || code === '------') return;
+    try {
+      await navigator.clipboard.writeText(code);
+    } catch {
+      const field = document.createElement('textarea');
+      field.value = code;
+      field.style.position = 'fixed';
+      field.style.opacity = '0';
+      document.body.appendChild(field);
+      field.select();
+      document.execCommand('copy');
+      field.remove();
+    }
+    copyRoomCodeBtn.textContent = `✅ Kode ${code} Tersalin`;
+    copyRoomCodeBtn.classList.add('copied');
+    window.setTimeout(() => {
+      copyRoomCodeBtn.textContent = '📋 Salin Kode Undangan';
+      copyRoomCodeBtn.classList.remove('copied');
+    }, 1800);
+  }
 
   // Audio context & sound effects
   let audioContext;
@@ -1394,14 +1484,25 @@
   function renderRoom(room) {
     multiplayerRoom = room;
     const players = room?.players || [];
-    roomPlayers.hidden = players.length === 0;
-    roomPlayers.innerHTML = players.map((player) => {
+    roomPlayers.hidden = false;
+    roomPlayers.innerHTML = [1, 2, 3, 4].map((slot) => {
+      const player = players.find((item) => item.slot === slot);
+      if (!player) return `<div class="room-player empty"><span>➕ Slot ${slot}<br><small>Menunggu pemain</small></span></div>`;
       const isMe = player.id === multiplayerPlayerId;
       const state = player.status === 'finished' ? 'Selesai' : player.status === 'playing' ? 'Main' : 'Siap';
-      return `<div class="room-player ${isMe ? 'me' : ''}"><span>${isMe ? 'Kamu' : player.name} · ${state}</span><span class="room-player-score">⭐ ${player.score}</span></div>`;
+      return `<div class="room-player ${isMe ? 'me' : ''}"><span><span class="room-player-character">${player.character || '🐼'}</span>${isMe ? 'Kamu' : player.name}<br><small>${state}</small></span><span class="room-player-score">⭐ ${player.score}</span></div>`;
     }).join('');
 
     renderPlayerSlots(players);
+    lobbyRoomCode.textContent = room.code;
+    const isHost = room.hostId === multiplayerPlayerId;
+    lobbyStartBtn.hidden = !isHost;
+    lobbyStartBtn.disabled = players.length < 2 || room.started;
+    lobbyRole.textContent = isHost ? '👑 Kamu Host' : '🎮 Kamu Player';
+    lobbyRole.classList.toggle('guest', !isHost);
+    lobbyWaitingText.innerHTML = players.length < 2
+      ? 'Menunggu pemain lain<span class="waiting-dots"></span>'
+      : `${players.length} pemain sudah bergabung. ${isHost ? 'Game siap dimulai!' : 'Menunggu host memulai game.'}`;
 
     if (room.finished) {
       setRoomStatus('Pertandingan selesai. Lihat hasil akhir!');
@@ -1409,7 +1510,7 @@
       setRoomStatus('Pertandingan dimulai! Kejar skor temanmu.');
       scheduleMultiplayerStart(room.startAt);
     } else {
-      setRoomStatus(`${players.length}/4 pemain di room ${room.code}. Tekan Start untuk mulai bersama.`);
+      setRoomStatus(`${players.length}/4 pemain di room ${room.code}.`);
     }
   }
 
@@ -1485,7 +1586,7 @@
     const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
     multiplayerSocket = new WebSocket(`${protocol}//${location.host}/ws`);
     multiplayerSocket.addEventListener('open', () => {
-      multiplayerSocket.send(JSON.stringify({ type: create ? 'room:create' : 'room:join', roomCode, playerName, playerSlot: selectedPlayerSlot }));
+      multiplayerSocket.send(JSON.stringify({ type: create ? 'room:create' : 'room:join', roomCode, playerName, playerSlot: selectedPlayerSlot, character: selectedCharacter }));
     });
     multiplayerSocket.addEventListener('message', (event) => {
       const message = JSON.parse(event.data);
@@ -1493,6 +1594,7 @@
       if (message.type === 'room:joined' || message.type === 'room:update') {
         renderRoom(message.room);
         if (message.type === 'room:joined') {
+          showMabarStep('lobby');
           roomCodeInput.value = message.room.code;
           const myPlayer = message.room.players.find((player) => player.id === multiplayerPlayerId);
           if (myPlayer) selectedPlayerSlot = myPlayer.slot;
@@ -1503,14 +1605,41 @@
         renderRoom(message.room);
         showMultiplayerResults(message.results);
       }
-      if (message.type === 'error') setRoomStatus(message.message, 'error');
+      if (message.type === 'error') {
+        showMabarStep(multiplayerRoom ? 'lobby' : 'setup');
+        setRoomStatus(message.message, 'error');
+        joinRoomBtn.disabled = false;
+        createRoomBtn.disabled = false;
+      }
     });
     multiplayerSocket.addEventListener('close', () => {
-      if (!gameActive) setRoomStatus('Koneksi room terputus. Coba gabung lagi.', 'error');
+      if (!gameActive && !intentionalRoomClose) setRoomStatus('Koneksi room terputus. Coba gabung lagi.', 'error');
+      intentionalRoomClose = false;
       joinRoomBtn.disabled = false;
       createRoomBtn.disabled = false;
     });
     multiplayerSocket.addEventListener('error', () => setRoomStatus('Server multiplayer belum terhubung. Jalankan server game.', 'error'));
+  }
+
+  function prepareRoomEntry(create) {
+    const playerName = mabarNameInput.value.trim();
+    const roomCode = roomCodeInput.value.trim();
+    if (!playerName) {
+      setRoomStatus('Isi nama pemain terlebih dahulu.', 'error');
+      mabarNameInput.focus();
+      return;
+    }
+    if (!create && !roomCode) {
+      setRoomStatus('Masukkan kode room dulu ya.', 'error');
+      roomCodeInput.focus();
+      return;
+    }
+    pendingRoomCreate = create;
+    selectedPlayerSlot = null;
+    selectedCharacter = '';
+    characterGrid.querySelectorAll('.character-card').forEach((card) => card.classList.remove('selected'));
+    confirmCharacterBtn.disabled = true;
+    showMabarStep('character');
   }
 
   function setUsernameHint(text, kind = '') {
@@ -2176,6 +2305,7 @@
     mabarNameInput.value = savedName;
     if (!multiplayerRoom) selectedPlayerSlot = null;
     mabarModal.hidden = false;
+    showMabarStep(multiplayerRoom ? 'lobby' : 'setup');
     renderPlayerSlots();
   });
 
@@ -2201,8 +2331,34 @@
     if (name) usernameInput.value = name;
   });
 
-  createRoomBtn.addEventListener('click', () => connectToRoom(true));
-  joinRoomBtn.addEventListener('click', () => connectToRoom());
+  createRoomBtn.addEventListener('click', () => prepareRoomEntry(true));
+  joinRoomBtn.addEventListener('click', () => prepareRoomEntry(false));
+  characterGrid.addEventListener('click', (event) => {
+    const card = event.target.closest('.character-card');
+    if (!card) return;
+    selectedPlayerSlot = Number(card.dataset.slot);
+    selectedCharacter = card.dataset.character;
+    characterGrid.querySelectorAll('.character-card').forEach((item) => item.classList.toggle('selected', item === card));
+    confirmCharacterBtn.disabled = false;
+  });
+  characterBackBtn.addEventListener('click', () => showMabarStep('setup'));
+  confirmCharacterBtn.addEventListener('click', () => connectToRoom(pendingRoomCreate));
+  lobbyStartBtn.addEventListener('click', () => {
+    if (!multiplayerSocket || multiplayerSocket.readyState !== WebSocket.OPEN) return;
+    lobbyStartBtn.disabled = true;
+    multiplayerSocket.send(JSON.stringify({ type: 'room:start' }));
+  });
+  copyRoomCodeBtn.addEventListener('click', copyRoomCode);
+  leaveLobbyBtn.addEventListener('click', () => {
+    intentionalRoomClose = true;
+    multiplayerRoom = null;
+    multiplayerPlayerId = null;
+    multiplayerSocket?.close();
+    multiplayerSocket = null;
+    roomPlayers.innerHTML = '';
+    roomCodeInput.value = '';
+    showMabarStep('setup');
+  });
   roomCodeInput.addEventListener('input', () => {
     roomCodeInput.value = roomCodeInput.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
   });
