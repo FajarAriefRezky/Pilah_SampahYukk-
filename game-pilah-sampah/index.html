@@ -723,6 +723,7 @@
     .multiplayer-hud-players{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:5px;}
     .multiplayer-hud-player{min-width:0; padding:5px 6px; border-radius:9px; background:rgba(255,255,255,.13); color:#fff; font-size:10px; text-align:center;}
     .multiplayer-hud-player.me{outline:2px solid #ffd45f; background:rgba(255,212,95,.22);}
+    .multiplayer-hud-player.watching{outline:2px solid #6ff0a0; background:rgba(91,224,139,.25); cursor:pointer;}
     .multiplayer-hud-player strong,.multiplayer-hud-player span{display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
     .multiplayer-hud-player strong{font-size:11px;}
     .multiplayer-hud-player span{margin-top:2px; color:#fff2a8; font-weight:800;}
@@ -1376,6 +1377,9 @@
   let intentionalRoomClose = false;
   let matchTimerInterval = null;
   let connectionPingInterval = null;
+  let gameplayBroadcastInterval = null;
+  let spectatorViewingPlayerId = null;
+  let gameplayStreamSequence = 0;
 
   function syncTabletViewport() {
     const viewportHeight = window.visualViewport?.height || window.innerHeight;
@@ -1634,7 +1638,8 @@
       .map((player) => {
         const isMe = player.id === multiplayerPlayerId;
         const state = player.status === 'finished' ? 'Selesai' : `❤ ${Math.max(0, player.lives)}`;
-        return `<div class="multiplayer-hud-player ${isMe ? 'me' : ''}"><strong>${player.character || '🎮'} ${isMe ? 'Kamu' : player.name}</strong><span>⭐ ${player.score} · ${state}</span></div>`;
+        const watching = multiplayerRole === 'spectator' && player.id === spectatorViewingPlayerId;
+        return `<div class="multiplayer-hud-player ${isMe ? 'me' : ''} ${watching ? 'watching' : ''}" data-player-id="${escapeHtml(player.id)}"><strong>${player.character || '🎮'} ${isMe ? 'Kamu' : player.name}</strong><span>⭐ ${player.score} · ${state}</span></div>`;
       }).join('');
     multiplayerHud.hidden = !room.started;
     updateMatchTimer(room);
@@ -1667,14 +1672,47 @@
     clearInterval(dropInterval);
     stopBgm();
     game.classList.add('is-playing');
+    multiplayerHud.style.pointerEvents = 'auto';
+    if (!spectatorViewingPlayerId) spectatorViewingPlayerId = multiplayerRoom?.players?.[0]?.id || null;
     if (startOverlay.isConnected) startOverlay.remove();
     document.getElementById('spectatorBanner')?.remove();
     const banner = document.createElement('div');
     banner.id = 'spectatorBanner';
     banner.className = 'room-status';
     banner.style.cssText = 'position:absolute;z-index:9;left:50%;top:122px;transform:translateX(-50%);background:#eef8ff;border-radius:999px;padding:7px 14px;font-weight:800;white-space:nowrap';
-    banner.textContent = '👁️ MODE SPECTATOR · Menonton pertandingan';
+    const watched = multiplayerRoom?.players?.find((player) => player.id === spectatorViewingPlayerId);
+    banner.textContent = `👁️ MENONTON ${watched?.name || 'PEMAIN'} · Klik pemain di HUD untuk berpindah`;
     game.appendChild(banner);
+  }
+
+  function sendGameplaySnapshot() {
+    if (multiplayerRole === 'spectator' || !gameActive || !multiplayerRoom?.spectators?.length || multiplayerSocket?.readyState !== WebSocket.OPEN) return;
+    const area = playArea.getBoundingClientRect();
+    if (!area.width || !area.height) return;
+    const items = [...playArea.querySelectorAll('.falling-item[data-state="falling"]')].map((item) => {
+      if (!item.dataset.streamId) item.dataset.streamId = `i${++gameplayStreamSequence}`;
+      const rect = item.getBoundingClientRect();
+      return {
+        id: item.dataset.streamId,
+        emoji: item.querySelector('.item-emoji')?.textContent || '🗑️',
+        label: item.querySelector('.item-label')?.textContent || '',
+        x: (rect.left - area.left) / area.width,
+        y: (rect.top - area.top) / area.height,
+      };
+    });
+    const maxOffset = Math.max(1, area.width * .42);
+    multiplayerSocket.send(JSON.stringify({ type: 'player:gameplay', snapshot: { items, organik: organikOffset / maxOffset, nonOrganik: nonOffset / maxOffset } }));
+  }
+
+  function renderSpectatorGameplay(message) {
+    if (multiplayerRole !== 'spectator') return;
+    if (!spectatorViewingPlayerId) spectatorViewingPlayerId = message.playerId;
+    if (message.playerId !== spectatorViewingPlayerId) return;
+    const snapshot = message.snapshot || {};
+    playArea.innerHTML = (snapshot.items || []).map((item) => `<div class="falling-item" style="left:${item.x * 100}%;top:${item.y * 100}%;transform:translate(-50%,-50%);transition:left .12s linear,top .12s linear"><span class="item-emoji">${escapeHtml(item.emoji)}</span><span class="item-label">${escapeHtml(item.label)}</span></div>`).join('');
+    const maxOffset = (playArea.clientWidth || game.clientWidth) * .42;
+    binOrganik.style.transform = `translateX(${(Number(snapshot.organik) || 0) * maxOffset}px)`;
+    binNon.style.transform = `translateX(${(Number(snapshot.nonOrganik) || 0) * maxOffset}px)`;
   }
 
   function updateMatchTimer(room = multiplayerRoom) {
@@ -1731,6 +1769,7 @@
     if (!results.length) return;
     gameActive = false;
     clearInterval(dropInterval);
+    clearInterval(gameplayBroadcastInterval);
     stopBgm();
     playArea.querySelectorAll('.falling-item').forEach((item) => item.remove());
     document.getElementById('gameOverOverlay')?.remove();
@@ -1780,6 +1819,7 @@
   function prepareMultiplayerRematchLobby() {
     document.getElementById('gameOverOverlay')?.remove();
     clearInterval(dropInterval);
+    clearInterval(gameplayBroadcastInterval);
     gameActive = false;
     score = 0;
     lives = 3;
@@ -1797,6 +1837,7 @@
 
   function showMultiplayerDisconnected() {
     clearInterval(dropInterval);
+    clearInterval(gameplayBroadcastInterval);
     gameActive = false;
     stopBgm();
     document.getElementById('gameOverOverlay')?.remove();
@@ -1856,6 +1897,7 @@
     });
     multiplayerSocket.addEventListener('message', (event) => {
       const message = JSON.parse(event.data);
+      if (message.type === 'spectator:gameplay') { renderSpectatorGameplay(message); return; }
       if (message.type === 'server:pong') {
         const latency = Date.now() - message.sentAt;
         connectionBadge.textContent = latency > 500 ? `Lemah ${latency}ms` : `${latency}ms`;
@@ -2494,6 +2536,7 @@
   function endGame(){
     gameActive = false;
     clearInterval(dropInterval);
+    clearInterval(gameplayBroadcastInterval);
     stopBgm();
     soundGameOver();
     submitScore(score);
@@ -2534,6 +2577,8 @@
     playArea.innerHTML = '';
     applyDifficulty();
     gameActive = true;
+    clearInterval(gameplayBroadcastInterval);
+    gameplayBroadcastInterval = setInterval(sendGameplaySnapshot, 120);
     sendPlayerUpdate('playing');
     clearInterval(dropInterval);
     dropInterval = setInterval(spawnWave, spawnRate);
@@ -2641,6 +2686,14 @@
     selectedCharacter = '👁️';
     connectToRoom(false, true);
   });
+  multiplayerHudPlayers.addEventListener('click', (event) => {
+    if (multiplayerRole !== 'spectator') return;
+    const card = event.target.closest('[data-player-id]');
+    if (!card) return;
+    spectatorViewingPlayerId = card.dataset.playerId;
+    playArea.innerHTML = '';
+    renderRoom(multiplayerRoom);
+  });
   characterGrid.addEventListener('click', (event) => {
     const card = event.target.closest('.character-card');
     if (!card) return;
@@ -2662,6 +2715,7 @@
     multiplayerRoom = null;
     multiplayerPlayerId = null;
     multiplayerRole = 'player';
+    spectatorViewingPlayerId = null;
     multiplayerSocket?.close();
     multiplayerSocket = null;
     multiplayerHud.hidden = true;

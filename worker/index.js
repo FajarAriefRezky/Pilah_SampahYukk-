@@ -335,6 +335,21 @@ export class GameHub {
       return;
     }
 
+    if (message.type === 'player:gameplay' && player && room.started && !room.finished) {
+      const rawSnapshot = message.snapshot || {};
+      const snapshot = {
+        items: (Array.isArray(rawSnapshot.items) ? rawSnapshot.items : []).slice(0, 16).map((item) => ({
+          id: String(item.id || '').slice(0, 24), emoji: String(item.emoji || '🗑️').slice(0, 12), label: String(item.label || '').slice(0, 24),
+          x: Math.max(0, Math.min(1, Number(item.x) || 0)), y: Math.max(-0.2, Math.min(1.2, Number(item.y) || 0)),
+        })),
+        organik: Math.max(-1, Math.min(1, Number(rawSnapshot.organik) || 0)),
+        nonOrganik: Math.max(-1, Math.min(1, Number(rawSnapshot.nonOrganik) || 0)),
+      };
+      const payload = { type: 'spectator:gameplay', playerId: connection.playerId, snapshot };
+      room.spectators.forEach((member) => this.send(member.socket, payload));
+      return;
+    }
+
     if (message.type === 'player:update' && room.started && !room.finished) {
       if (!player) return;
       const now = Date.now();
