@@ -5,10 +5,11 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node --watch server.js",
-    "tunnel": "npm start & npx localtunnel --port 3000 --print both",
-    "public": "npm start & npx localtunnel --port 3000 --print both",
+    "start": "node game-pilah-sampah/server.js",
+    "dev": "node --watch game-pilah-sampah/server.js",
+    "test:multiplayer": "node tests/multiplayer.cjs",
+    "tunnel": "node tunnel.js",
+    "public": "node tunnel.js",
     "deploy:cloudflare": "npx wrangler pages deploy game-pilah-sampah --project-name pilah-yuk-game",
     "deploy:netlify": "npx netlify deploy --prod --dir=game-pilah-sampah",
     "deploy:vercel": "npx vercel --prod"
@@ -21,6 +22,7 @@
     "node": ">=16.0.0"
   },
   "devDependencies": {
-    "localtunnel": "^2.0.2"
+    "localtunnel": "^2.0.2",
+    "wrangler": "^4.111.0"
   }
 }

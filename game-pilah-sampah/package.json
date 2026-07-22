@@ -1,0 +1,11 @@
+{
+  "name": "game-pilah-sampah",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  }
+}
