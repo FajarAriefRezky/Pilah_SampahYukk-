@@ -26,7 +26,7 @@
       --danger:#d1583f;
     }
     
-    *{box-sizing:border-box;}
+    *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
     
     html, body{
       margin:0; padding:0; height:100%;
@@ -40,7 +40,7 @@
     
     .game{
       position:relative;
-      width:100%; height:100vh;
+      width:100%; height:var(--app-height, 100vh);
       max-width:520px; margin:0 auto;
       display:flex; flex-direction:column;
       overflow:hidden;
@@ -49,6 +49,7 @@
         linear-gradient(180deg, rgba(255,218,175,.6) 0%, rgba(251,187,168,.45) 40%, rgba(128,194,156,.28) 100%);
       border-left:1px solid rgba(255,255,255,.35);
       border-right:1px solid rgba(255,255,255,.35);
+      min-height:100svh;
     }
 
     .game.is-playing header,
@@ -348,15 +349,15 @@
     }
     
     .bin{
-      flex:0 0 140px;
+      flex:0 0 112px;
       border-radius:50% 50% 40% 40%;
-      padding:16px 0;
+      padding:10px 0;
       text-align:center;
       position:relative;
       box-shadow:0 8px 0 rgba(0,0,0,.2), inset 0 -4px 8px rgba(0,0,0,.2);
       cursor:grab;
       transition:transform .18s cubic-bezier(.2,.8,.2,1), box-shadow .18s ease;
-      height:120px;
+      height:96px;
       display:flex;
       flex-direction:column;
       align-items:center;
@@ -380,7 +381,7 @@
     .bin.organik{background:linear-gradient(135deg, #4a9d5f 0%, var(--organik-dark) 100%);}
     .bin.non-organik{background:linear-gradient(135deg, #4a7ab5 0%, var(--nonorganik-dark) 100%);}
     
-    .bin .icon{font-size:56px; display:block; margin-bottom:4px; line-height:1;}
+    .bin .icon{font-size:44px; display:block; margin-bottom:3px; line-height:1;}
     .bin .label{
       font-family:'Baloo 2', sans-serif;
       font-weight:600;
@@ -512,6 +513,11 @@
       transform:translate3d(calc(var(--parallax-x, 0px) * 0.2), calc(var(--parallax-y, 0px) * 0.2), 0);
       animation:popupScale .5s cubic-bezier(.18,.92,.22,1) both;
       transition:transform .28s ease, opacity .28s ease, filter .28s ease;
+      max-height:calc(100dvh - 40px);
+      overflow-y:auto;
+      overscroll-behavior:contain;
+      touch-action:pan-y;
+      -webkit-overflow-scrolling:touch;
     }
 
     .opening-card .opening-title,
@@ -707,8 +713,21 @@
     .room-player{display:flex; align-items:center; justify-content:space-between; gap:8px; padding:5px 7px; border-radius:9px; font-size:11px; color:#f9fff0; background:rgba(255,255,255,.1);}
     .room-player.me{border:1px solid rgba(255,245,183,.7); background:rgba(255,245,183,.15);}
     .room-player-score{font-weight:800; white-space:nowrap;}
+    .multiplayer-hud{position:absolute; z-index:8; top:64px; left:50%; transform:translateX(-50%); width:min(calc(100% - 20px), 520px); padding:7px; border-radius:14px; background:rgba(24,55,76,.88); box-shadow:0 5px 18px rgba(0,0,0,.2); pointer-events:none;}
+    .multiplayer-hud[hidden]{display:none;}
+    .multiplayer-hud-title{text-align:center; color:#dff3ff; font-size:10px; font-weight:800; letter-spacing:.8px; margin-bottom:5px;}
+    .connection-badge{display:inline-flex; align-items:center; gap:4px; margin-left:7px; color:#bff4ca; font-size:9px;}
+    .connection-badge::before{content:''; width:7px; height:7px; border-radius:50%; background:#66df83; box-shadow:0 0 7px #66df83;}
+    .connection-badge.weak{color:#ffe18b}.connection-badge.weak::before{background:#ffc84d;box-shadow:0 0 7px #ffc84d}
+    .connection-badge.offline{color:#ffb4aa}.connection-badge.offline::before{background:#ee6657;box-shadow:none}
+    .multiplayer-hud-players{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:5px;}
+    .multiplayer-hud-player{min-width:0; padding:5px 6px; border-radius:9px; background:rgba(255,255,255,.13); color:#fff; font-size:10px; text-align:center;}
+    .multiplayer-hud-player.me{outline:2px solid #ffd45f; background:rgba(255,212,95,.22);}
+    .multiplayer-hud-player strong,.multiplayer-hud-player span{display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+    .multiplayer-hud-player strong{font-size:11px;}
+    .multiplayer-hud-player span{margin-top:2px; color:#fff2a8; font-weight:800;}
     .gas-mabar-btn{width:100%; margin-top:10px; background:#82c8ff; color:#173d62; box-shadow:0 4px 0 #4f91c8;}
-    .mabar-card{position:relative; width:min(100%, 350px); max-height:90vh; overflow:auto; background:linear-gradient(180deg, #f5fbff 0%, #e4f3ff 100%); color:#213744; border-radius:24px; padding:18px 16px; box-shadow:0 18px 50px rgba(0,0,0,.32);}
+    .mabar-card{position:relative; width:min(100%, 350px); max-height:90dvh; overflow:auto; overscroll-behavior:contain; touch-action:pan-y; -webkit-overflow-scrolling:touch; background:linear-gradient(180deg, #f5fbff 0%, #e4f3ff 100%); color:#213744; border-radius:24px; padding:18px 16px; box-shadow:0 18px 50px rgba(0,0,0,.32);}
     .mabar-card h3{margin:0 0 5px; font-family:'Baloo 2', sans-serif; font-size:25px; text-align:center; color:#28507a;}
     .mabar-card.in-lobby{width:min(100%, 410px);}
     .mabar-desc{margin:0 0 12px; text-align:center; font-size:12px; color:#526d7d;}
@@ -936,8 +955,23 @@
     .match-results p{text-align:center; margin:0 0 14px; color:#526557; font-size:13px;}
     .match-result-list{list-style:none; padding:0; margin:0; display:grid; gap:7px;}
     .match-result-item{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:9px 10px; border-radius:12px; background:rgba(255,255,255,.75); font-size:13px; font-weight:700;}
+    .match-result-item:first-child{background:linear-gradient(135deg,#fff3bd,#ffe17a); outline:2px solid #e5b62f;}
     .match-result-item.me{background:#fff1bd; outline:1px solid #eabf47;}
     .match-result-rank{min-width:32px; color:#8a6318;}
+    .match-result-player{display:flex; align-items:center; gap:7px; min-width:0; flex:1;}
+    .match-result-character{font-size:23px;}
+    .match-result-name{overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+    .match-winner{margin:8px 0 14px; padding:14px 10px; border:2px solid #e1b536; border-radius:16px; text-align:center; background:linear-gradient(180deg,#fff7d2,#ffe58d); color:#6c5014; font-size:13px; font-weight:800; box-shadow:0 4px 0 #d8aa2c;}
+    .match-winner-crown{display:block; margin-bottom:4px; font-size:34px; line-height:1; animation:winnerBounce 1.1s ease-in-out infinite;}
+    .match-winner-title{display:block; font-size:11px; letter-spacing:1px;}
+    .match-winner-name{display:block; margin:2px 0; color:#533800; font-family:'Baloo 2',sans-serif; font-size:23px; line-height:1.2;}
+    .podium{display:flex; align-items:flex-end; justify-content:center; gap:5px; min-height:112px; margin:10px 0 14px;}
+    .podium-place{flex:1; max-width:92px; padding:8px 4px; border-radius:12px 12px 4px 4px; text-align:center; background:#dcebf3; animation:podiumRise .55s both;}
+    .podium-place.first{min-height:104px;background:#ffe17a;animation-delay:.15s}.podium-place.second{min-height:78px;background:#dbe2e8}.podium-place.third{min-height:62px;background:#e9bd91;animation-delay:.3s}
+    .podium-place span,.podium-place strong{display:block}.podium-place .podium-character{font-size:27px}.podium-place strong{overflow:hidden;text-overflow:ellipsis;font-size:10px}
+    .match-history{margin-top:12px;padding-top:10px;border-top:1px solid #cbdccf}.match-history summary{cursor:pointer;text-align:center;font-size:12px;font-weight:800}.match-history-item{margin-top:6px;font-size:11px;color:#526557}
+    @keyframes podiumRise{from{opacity:0;transform:translateY(35px)}to{opacity:1;transform:none}}
+    @keyframes winnerBounce{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-4px) rotate(4deg)}}
 
     .btn.sound-off{
       background:#d7e7d6;
@@ -964,6 +998,8 @@
       cursor:pointer;
       margin-top:8px;
       transition:all .1s;
+      min-height:44px;
+      touch-action:manipulation;
     }
     
     .btn:active{
@@ -979,7 +1015,7 @@
     }
 
     @media (max-width:480px){
-      .game{height:100dvh;}
+      .game{height:var(--app-height, 100dvh);}
       .title{font-size:20px;}
       .stats{gap:6px;}
       .stat-pill{padding:5px 9px; font-size:13px;}
@@ -999,25 +1035,80 @@
       .play-area{padding-bottom:clamp(54px, 7vh, 90px);}
       .play-area::before{bottom:clamp(6px, 1vh, 26px);}
       .bins-area{bottom:calc(env(safe-area-inset-bottom) + clamp(4px, 1vh, 14px)); padding:0 12px;}
-      .bin{flex:0 0 124px; height:108px;}
-      .bin .icon{font-size:42px;}
+      .bin{flex:0 0 100px; height:88px;}
+      .bin .icon{font-size:36px;}
     }
 
     @media (max-width:900px){
-      .game{height:100dvh;}
+      .game{height:var(--app-height, 100dvh);}
       .play-area{padding-bottom:clamp(58px, 8vh, 96px);}
       .play-area::before{bottom:clamp(8px, 1.2vh, 30px);}
       .bins-area{bottom:calc(env(safe-area-inset-bottom) + clamp(4px, 1vh, 16px)); padding:0 12px;}
     }
 
+    /* iPad dan tablet: manfaatkan layar lebih luas tanpa membesarkan game berlebihan. */
+    @media (min-width:600px) and (max-width:1100px){
+      .game{width:100%; max-width:760px; height:var(--app-height, 100dvh); min-height:100svh;}
+      header{padding:18px 24px 11px;}
+      .title{font-size:28px;}
+      .stats{gap:10px;}
+      .stat-pill{padding:8px 14px; font-size:16px;}
+      .play-area{padding-bottom:clamp(108px, 14vh, 158px);}
+      .falling-item{width:96px; height:96px; border-radius:21px;}
+      .item-emoji{font-size:44px;}
+      .item-label{font-size:11px;}
+      .bins-area{bottom:calc(env(safe-area-inset-bottom) + clamp(14px, 2vh, 26px)); padding:0 24px;}
+      .bin{flex-basis:168px; height:138px; padding:18px 0;}
+      .bin + .bin{margin-left:-6px;}
+      .bin .icon{font-size:62px;}
+      .bin .label{font-size:13px;}
+      .opening-card{width:min(100%,430px); padding:24px 24px 22px;}
+      .opening-logo{width:142px; height:142px;}
+      .opening-logo-img{width:132px; height:132px;}
+      .mabar-card{width:min(100%,480px); padding:22px 20px;}
+      .mabar-card.in-lobby{width:min(100%,540px);}
+      .mabar-card h3{font-size:29px;}
+      .mabar-desc{font-size:14px;}
+      .auth-input{min-height:46px; padding:11px 13px; font-size:14px;}
+      .character-grid{gap:12px;}
+      .character-card{min-height:128px; font-size:14px; touch-action:manipulation;}
+      .character-emoji{font-size:50px;}
+      #lobbyStep .room-player{min-height:72px; font-size:13px;}
+      .room-player-character{font-size:29px;}
+    }
+
+    /* iPad landscape: ringkas elemen vertikal agar kontrol tidak terpotong. */
+    @media (min-width:700px) and (max-width:1200px) and (orientation:landscape){
+      .game{max-width:920px;}
+      header{padding:9px 22px 6px;}
+      .title{font-size:23px;}
+      .stat-pill{padding:5px 11px; font-size:14px;}
+      .play-area{padding-bottom:76px;}
+      .bins-area{bottom:calc(env(safe-area-inset-bottom) + 5px);}
+      .bin{flex-basis:138px; height:104px; padding:9px 0;}
+      .bin .icon{font-size:43px;}
+      .opening-card{max-height:calc(100dvh - 24px); padding:14px 20px;}
+      .opening-logo{width:88px; height:88px; margin-bottom:5px;}
+      .opening-logo-img{width:82px; height:82px;}
+      .opening-badge{margin-bottom:5px; padding:4px 9px;}
+      .opening-title{font-size:29px; margin-bottom:5px;}
+      .auth-panel{margin:6px 0; padding:7px;}
+      .gas-mabar-btn{margin-top:5px;}
+      .opening-actions{margin-top:5px;}
+      .mabar-card{max-height:calc(100dvh - 24px);}
+      .character-grid{grid-template-columns:repeat(4,1fr); margin:9px 0;}
+      .character-card{min-height:98px; padding:8px 5px;}
+      .character-emoji{font-size:40px;}
+    }
+
     @media (pointer:coarse){
-      .game{height:100dvh;}
+      .game{height:var(--app-height, 100dvh);}
       .play-area{padding-bottom:clamp(58px, 8vh, 96px);}
       .play-area::before{bottom:clamp(8px, 1.2vh, 30px);}
       .bins-area{bottom:calc(env(safe-area-inset-bottom) + clamp(4px, 1vh, 16px)); padding:0 12px;}
       .bin{
-        flex:0 0 130px;
-        height:112px;
+        flex:0 0 100px;
+        height:88px;
       }
       .bin::before{
         content:'';
@@ -1054,8 +1145,14 @@
       <div class="stat-pill">⭐ <span id="score">0</span></div>
       <div class="stat-pill">LV <span id="level">1</span></div>
       <div class="stat-pill lives" id="lives">❤️❤️❤️</div>
+      <div class="stat-pill" id="matchTimer" hidden>⏱ 01:30</div>
     </div>
   </header>
+
+  <div class="multiplayer-hud" id="multiplayerHud" hidden>
+    <div class="multiplayer-hud-title"><span id="multiplayerHudTitle">SKOR ROOM</span><span class="connection-badge" id="connectionBadge">Online</span></div>
+    <div class="multiplayer-hud-players" id="multiplayerHudPlayers"></div>
+  </div>
 
   <div class="play-area" id="playArea"></div>
 
@@ -1126,6 +1223,7 @@
         <button class="btn" id="createRoomBtn" type="button">Buat Room</button>
         <button class="btn" id="joinRoomBtn" type="button">Gabung Room</button>
       </div>
+      <button class="btn copy-room-btn" id="spectateRoomBtn" type="button">👁️ Tonton Room sebagai Spectator</button>
       <div id="roomStatus" class="room-status">Siap mabar bersama teman!</div>
       </div>
       <div class="mabar-step" id="characterStep" hidden>
@@ -1136,6 +1234,8 @@
           <button class="character-card" type="button" data-slot="2" data-character="🐰"><span class="character-emoji">🐰</span>Bubu Kelinci</button>
           <button class="character-card" type="button" data-slot="3" data-character="🦊"><span class="character-emoji">🦊</span>Fufu Rubah</button>
           <button class="character-card" type="button" data-slot="4" data-character="🐸"><span class="character-emoji">🐸</span>Koko Katak</button>
+          <button class="character-card" type="button" data-slot="5" data-character="🐨"><span class="character-emoji">🐨</span>Kiki Koala</button>
+          <button class="character-card" type="button" data-slot="6" data-character="🦁"><span class="character-emoji">🦁</span>Lilo Singa</button>
         </div>
         <div class="mabar-actions"><button class="btn" id="characterBackBtn" type="button">Kembali</button><button class="btn" id="confirmCharacterBtn" type="button" disabled>Masuk Lobby</button></div>
       </div>
@@ -1153,6 +1253,8 @@
         <button class="player-slot" type="button" data-slot="2">Player 2<small>Kosong</small></button>
         <button class="player-slot" type="button" data-slot="3">Player 3<small>Kosong</small></button>
         <button class="player-slot" type="button" data-slot="4">Player 4<small>Kosong</small></button>
+        <button class="player-slot" type="button" data-slot="5">Player 5<small>Kosong</small></button>
+        <button class="player-slot" type="button" data-slot="6">Player 6<small>Kosong</small></button>
       </div>
     </div>
   </div>
@@ -1211,6 +1313,7 @@
   const roomCodeInput = document.getElementById('roomCodeInput');
   const createRoomBtn = document.getElementById('createRoomBtn');
   const joinRoomBtn = document.getElementById('joinRoomBtn');
+  const spectateRoomBtn = document.getElementById('spectateRoomBtn');
   const roomStatus = document.getElementById('roomStatus');
   const roomPlayers = document.getElementById('roomPlayers');
   const roomSetupStep = document.getElementById('roomSetupStep');
@@ -1225,6 +1328,11 @@
   const lobbyWaitingText = document.getElementById('lobbyWaitingText');
   const leaveLobbyBtn = document.getElementById('leaveLobbyBtn');
   const lobbyStartBtn = document.getElementById('lobbyStartBtn');
+  const multiplayerHud = document.getElementById('multiplayerHud');
+  const multiplayerHudTitle = document.getElementById('multiplayerHudTitle');
+  const multiplayerHudPlayers = document.getElementById('multiplayerHudPlayers');
+  const matchTimer = document.getElementById('matchTimer');
+  const connectionBadge = document.getElementById('connectionBadge');
 
   let score = 0;
   let lives = 3;
@@ -1259,12 +1367,30 @@
   let multiplayerSocket = null;
   let multiplayerRoom = null;
   let multiplayerPlayerId = null;
+  let multiplayerRole = 'player';
   let multiplayerStartTimer = null;
   let multiplayerStarting = false;
   let selectedPlayerSlot = null;
   let selectedCharacter = '';
   let pendingRoomCreate = false;
   let intentionalRoomClose = false;
+  let matchTimerInterval = null;
+  let connectionPingInterval = null;
+
+  function syncTabletViewport() {
+    const viewportHeight = window.visualViewport?.height || window.innerHeight;
+    document.documentElement.style.setProperty('--app-height', `${Math.round(viewportHeight)}px`);
+
+    const maxOffset = (playArea.clientWidth || game.clientWidth) * 0.42;
+    organikOffset = Math.max(-maxOffset, Math.min(maxOffset, organikOffset));
+    nonOffset = Math.max(-maxOffset, Math.min(maxOffset, nonOffset));
+    organikTargetOffset = organikOffset;
+    nonTargetOffset = nonOffset;
+    if (!draggingBin) {
+      binOrganik.style.transform = `translateX(${organikOffset}px)`;
+      binNon.style.transform = `translateX(${nonOffset}px)`;
+    }
+  }
 
   function showMabarStep(step) {
     roomSetupStep.hidden = step !== 'setup';
@@ -1481,24 +1607,44 @@
     roomStatus.classList.toggle('error', kind === 'error');
   }
 
+  function escapeHtml(value) {
+    return String(value ?? '').replace(/[&<>'"]/g, (character) => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+    })[character]);
+  }
+
   function renderRoom(room) {
     multiplayerRoom = room;
     const players = room?.players || [];
     roomPlayers.hidden = false;
-    roomPlayers.innerHTML = [1, 2, 3, 4].map((slot) => {
+    const playerRows = [1, 2, 3, 4, 5, 6].map((slot) => {
       const player = players.find((item) => item.slot === slot);
       if (!player) return `<div class="room-player empty"><span>➕ Slot ${slot}<br><small>Menunggu pemain</small></span></div>`;
       const isMe = player.id === multiplayerPlayerId;
-      const state = player.status === 'finished' ? 'Selesai' : player.status === 'playing' ? 'Main' : 'Siap';
+      const voted = room.rematchVotes?.includes(player.id);
+      const state = voted ? 'Siap rematch' : player.status === 'finished' ? 'Selesai' : player.status === 'playing' ? 'Main' : 'Siap';
       return `<div class="room-player ${isMe ? 'me' : ''}"><span><span class="room-player-character">${player.character || '🐼'}</span>${isMe ? 'Kamu' : player.name}<br><small>${state}</small></span><span class="room-player-score">⭐ ${player.score}</span></div>`;
     }).join('');
+    const spectatorRows = (room.spectators || []).map((spectator) => `<div class="room-player ${spectator.id === multiplayerPlayerId ? 'me' : ''}"><span>👁️ ${escapeHtml(spectator.name)}${spectator.id === multiplayerPlayerId ? ' (Kamu)' : ''}<br><small>Spectator</small></span></div>`).join('');
+    roomPlayers.innerHTML = `${playerRows}${spectatorRows ? `<div style="grid-column:1/-1;text-align:center;font-size:11px;font-weight:800;color:#526d7d">SPECTATOR (${room.spectators.length})</div>${spectatorRows}` : ''}`;
+
+    multiplayerHudTitle.textContent = `ROOM ${room.code} · SKOR LIVE`;
+    multiplayerHudPlayers.innerHTML = players
+      .sort((a, b) => a.slot - b.slot)
+      .map((player) => {
+        const isMe = player.id === multiplayerPlayerId;
+        const state = player.status === 'finished' ? 'Selesai' : `❤ ${Math.max(0, player.lives)}`;
+        return `<div class="multiplayer-hud-player ${isMe ? 'me' : ''}"><strong>${player.character || '🎮'} ${isMe ? 'Kamu' : player.name}</strong><span>⭐ ${player.score} · ${state}</span></div>`;
+      }).join('');
+    multiplayerHud.hidden = !room.started;
+    updateMatchTimer(room);
 
     renderPlayerSlots(players);
     lobbyRoomCode.textContent = room.code;
     const isHost = room.hostId === multiplayerPlayerId;
-    lobbyStartBtn.hidden = !isHost;
+    lobbyStartBtn.hidden = !isHost || multiplayerRole === 'spectator';
     lobbyStartBtn.disabled = players.length < 2 || room.started;
-    lobbyRole.textContent = isHost ? '👑 Kamu Host' : '🎮 Kamu Player';
+    lobbyRole.textContent = multiplayerRole === 'spectator' ? '👁️ Mode Spectator' : isHost ? '👑 Kamu Host' : '🎮 Kamu Player';
     lobbyRole.classList.toggle('guest', !isHost);
     lobbyWaitingText.innerHTML = players.length < 2
       ? 'Menunggu pemain lain<span class="waiting-dots"></span>'
@@ -1508,10 +1654,40 @@
       setRoomStatus('Pertandingan selesai. Lihat hasil akhir!');
     } else if (room.started) {
       setRoomStatus('Pertandingan dimulai! Kejar skor temanmu.');
-      scheduleMultiplayerStart(room.startAt);
+      mabarModal.hidden = true;
+      if (multiplayerRole === 'spectator') enterSpectatorMode();
+      else scheduleMultiplayerStart(room.startAt);
     } else {
-      setRoomStatus(`${players.length}/4 pemain di room ${room.code}.`);
+      setRoomStatus(`${players.length}/6 pemain di room ${room.code}.`);
     }
+  }
+
+  function enterSpectatorMode() {
+    gameActive = false;
+    clearInterval(dropInterval);
+    stopBgm();
+    game.classList.add('is-playing');
+    if (startOverlay.isConnected) startOverlay.remove();
+    document.getElementById('spectatorBanner')?.remove();
+    const banner = document.createElement('div');
+    banner.id = 'spectatorBanner';
+    banner.className = 'room-status';
+    banner.style.cssText = 'position:absolute;z-index:9;left:50%;top:122px;transform:translateX(-50%);background:#eef8ff;border-radius:999px;padding:7px 14px;font-weight:800;white-space:nowrap';
+    banner.textContent = '👁️ MODE SPECTATOR · Menonton pertandingan';
+    game.appendChild(banner);
+  }
+
+  function updateMatchTimer(room = multiplayerRoom) {
+    clearInterval(matchTimerInterval);
+    if (!room?.started || room.finished || !room.endAt) { matchTimer.hidden = true; return; }
+    const tick = () => {
+      const seconds = Math.max(0, Math.ceil((room.endAt - Date.now()) / 1000));
+      matchTimer.hidden = false;
+      matchTimer.textContent = `⏱ ${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}`;
+      if (!seconds) clearInterval(matchTimerInterval);
+    };
+    tick();
+    matchTimerInterval = setInterval(tick, 250);
   }
 
   function renderPlayerSlots(players = multiplayerRoom?.players || []) {
@@ -1522,7 +1698,7 @@
       slotButton.classList.toggle('selected', slot === selectedPlayerSlot || isMe);
       slotButton.classList.toggle('occupied', Boolean(player && !isMe));
       slotButton.disabled = Boolean(player && !isMe);
-      slotButton.innerHTML = `Player ${slot}<small>${player ? (isMe ? 'Kamu' : player.name) : 'Kosong'}</small>`;
+      slotButton.innerHTML = `Player ${slot}<small>${player ? (isMe ? 'Kamu' : escapeHtml(player.name)) : 'Kosong'}</small>`;
     });
   }
 
@@ -1535,24 +1711,101 @@
     game.appendChild(overlay);
   }
 
-  function showMultiplayerResults(results) {
+  function buildMatchResults(players = []) {
+    let previousScore = null;
+    let previousRank = 0;
+    return [...players]
+      .sort((a, b) => (Number(b.score) || 0) - (Number(a.score) || 0)
+        || String(a.name || '').localeCompare(String(b.name || '')))
+      .map((player, index) => {
+        const normalizedScore = Number(player.score) || 0;
+        if (normalizedScore !== previousScore) previousRank = index + 1;
+        previousScore = normalizedScore;
+        return { ...player, score: normalizedScore, rank: previousRank };
+      });
+  }
+
+  function showMultiplayerResults(rawResults = []) {
+    // Hentikan ronde di semua perangkat dan tampilkan hasil tanpa jeda.
+    const results = buildMatchResults(rawResults);
+    if (!results.length) return;
+    gameActive = false;
+    clearInterval(dropInterval);
+    stopBgm();
+    playArea.querySelectorAll('.falling-item').forEach((item) => item.remove());
     document.getElementById('gameOverOverlay')?.remove();
     const overlay = document.createElement('div');
     overlay.className = 'overlay';
     overlay.id = 'gameOverOverlay';
+    const medals = ['🥇', '🥈', '🥉'];
     const rows = results.map((player) => `
       <li class="match-result-item ${player.id === multiplayerPlayerId ? 'me' : ''}">
-        <span class="match-result-rank">#${player.rank}</span>
-        <span>${player.name}${player.id === multiplayerPlayerId ? ' (Kamu)' : ''}</span>
+        <span class="match-result-rank">${medals[player.rank - 1] || `#${player.rank}`}</span>
+        <span class="match-result-player"><span class="match-result-character">${escapeHtml(player.character || '🎮')}</span><span class="match-result-name">${escapeHtml(player.name)}${player.id === multiplayerPlayerId ? ' (Kamu)' : ''}</span></span>
         <strong>⭐ ${player.score}</strong>
       </li>`).join('');
+    const topScore = Math.max(0, ...results.map((player) => Number(player.score) || 0));
+    const winners = results.filter((player) => player.score === topScore);
+    const winnerNames = winners
+      .map((player) => `${escapeHtml(player.name)}${player.id === multiplayerPlayerId ? ' (Kamu)' : ''}`)
+      .join(' & ');
+    const winnerTitle = winners.length > 1 ? 'PEMENANG BERSAMA' : 'PEMENANG';
+    const podiumPlayers = results.slice(0, 3);
+    const podiumOrder = [podiumPlayers[1], podiumPlayers[0], podiumPlayers[2]];
+    const podium = podiumOrder.map((player, index) => player ? `<div class="podium-place ${['second','first','third'][index]}"><span class="podium-character">${escapeHtml(player.character || '🎮')}</span><strong>${escapeHtml(player.name)}</strong><span>${medals[player.rank - 1] || `#${player.rank}`} ⭐ ${player.score}</span></div>` : '').join('');
+    const history = (multiplayerRoom?.history || []).slice(1).map((match) => `<div class="match-history-item">${new Date(match.finishedAt).toLocaleTimeString('id-ID', {hour:'2-digit',minute:'2-digit'})} · ${escapeHtml(match.results?.filter((item) => item.rank === 1).map((item) => item.name).join(' & ') || '-')}</div>`).join('');
     overlay.innerHTML = `
       <div class="match-results">
-        <h2>Hasil Pertandingan</h2>
-        <p>Semua pemain telah selesai.</p>
+        <h2>Ranking Akhir</h2>
+        <p>Semua pemain telah game over.</p>
+        <div class="match-winner">
+          <span class="match-winner-crown">🏆</span>
+          <span class="match-winner-title">${winnerTitle}</span>
+          <strong class="match-winner-name">${winnerNames || '-'}</strong>
+          <span>Skor tertinggi: ⭐ ${topScore}</span>
+        </div>
+        <div class="podium">${podium}</div>
         <ol class="match-result-list">${rows}</ol>
+        ${history ? `<details class="match-history"><summary>Riwayat Match Sebelumnya</summary>${history}</details>` : ''}
+        ${multiplayerRole === 'spectator' ? '<p style="margin-top:14px">👁️ Kamu menonton sebagai spectator</p>' : `<button class="btn" id="rematchBtn" type="button" style="width:100%;margin-top:14px">✅ Siap Rematch (0/${results.length})</button>`}
       </div>`;
     game.appendChild(overlay);
+    document.getElementById('rematchBtn')?.addEventListener('click', () => {
+      if (multiplayerSocket?.readyState !== WebSocket.OPEN) return;
+      document.getElementById('rematchBtn').disabled = true;
+      multiplayerSocket.send(JSON.stringify({ type: 'room:rematch' }));
+    });
+  }
+
+  function prepareMultiplayerRematchLobby() {
+    document.getElementById('gameOverOverlay')?.remove();
+    clearInterval(dropInterval);
+    gameActive = false;
+    score = 0;
+    lives = 3;
+    level = 1;
+    correctCount = 0;
+    scoreEl.textContent = score;
+    levelEl.textContent = level;
+    updateLives();
+    playArea.innerHTML = '';
+    multiplayerHud.hidden = true;
+    matchTimer.hidden = true;
+    showMabarStep('lobby');
+    mabarModal.hidden = false;
+  }
+
+  function showMultiplayerDisconnected() {
+    clearInterval(dropInterval);
+    gameActive = false;
+    stopBgm();
+    document.getElementById('gameOverOverlay')?.remove();
+    const overlay = document.createElement('div');
+    overlay.className = 'overlay';
+    overlay.id = 'gameOverOverlay';
+    overlay.innerHTML = '<h2>Koneksi Terputus</h2><p>Koneksi ke room terhenti. Muat ulang halaman lalu gabung kembali menggunakan kode room.</p><button class="btn" id="reloadGameBtn" type="button">Muat Ulang</button>';
+    game.appendChild(overlay);
+    document.getElementById('reloadGameBtn')?.addEventListener('click', () => location.reload());
   }
 
   function scheduleMultiplayerStart(startAt) {
@@ -1564,20 +1817,29 @@
     clearTimeout(multiplayerStartTimer);
     multiplayerStartTimer = setTimeout(() => {
       multiplayerStarting = false;
-      closeOpeningAndStart();
+      mabarModal.hidden = true;
+      if (startOverlay.isConnected) closeOpeningAndStart();
+      else resetGame();
     }, delay);
   }
 
   function sendPlayerUpdate(status = gameActive ? 'playing' : 'finished') {
-    if (!multiplayerSocket || multiplayerSocket.readyState !== WebSocket.OPEN || !multiplayerRoom?.started) return;
-    multiplayerSocket.send(JSON.stringify({ type: 'player:update', score, lives, status }));
+    if (multiplayerRole === 'spectator') return;
+    if (!multiplayerSocket || multiplayerSocket.readyState !== WebSocket.OPEN) return;
+    const isFinished = status === 'finished';
+    multiplayerSocket.send(JSON.stringify({
+      type: 'player:update',
+      score,
+      lives: isFinished ? 0 : lives,
+      status: isFinished ? 'finished' : 'playing',
+    }));
   }
 
-  function connectToRoom(create = false) {
+  function connectToRoom(create = false, spectate = false) {
     const roomCode = roomCodeInput.value.trim().toUpperCase();
     const playerName = mabarNameInput.value.trim().slice(0, 18);
     if (!playerName) { setRoomStatus('Isi nama pemain sebelum memilih atau masuk room.', 'error'); return; }
-    if (!selectedPlayerSlot) { setRoomStatus('Pilih Player 1 sampai Player 4 terlebih dahulu.', 'error'); return; }
+    if (!spectate && !selectedPlayerSlot) { setRoomStatus('Pilih Player 1 sampai Player 6 terlebih dahulu.', 'error'); return; }
     if (!create && !roomCode) { setRoomStatus('Masukkan kode room dulu ya.', 'error'); return; }
     if (multiplayerSocket?.readyState === WebSocket.OPEN) multiplayerSocket.close();
     setRoomStatus(create ? 'Membuat room baru...' : 'Menghubungkan ke room...');
@@ -1586,24 +1848,55 @@
     const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
     multiplayerSocket = new WebSocket(`${protocol}//${location.host}/ws`);
     multiplayerSocket.addEventListener('open', () => {
-      multiplayerSocket.send(JSON.stringify({ type: create ? 'room:create' : 'room:join', roomCode, playerName, playerSlot: selectedPlayerSlot, character: selectedCharacter }));
+      connectionBadge.textContent = 'Online';
+      connectionBadge.className = 'connection-badge';
+      clearInterval(connectionPingInterval);
+      connectionPingInterval = setInterval(() => multiplayerSocket?.readyState === WebSocket.OPEN && multiplayerSocket.send(JSON.stringify({ type: 'client:ping', sentAt: Date.now() })), 5000);
+      multiplayerSocket.send(JSON.stringify({ type: spectate ? 'room:spectate' : create ? 'room:create' : 'room:join', roomCode, playerName, playerSlot: selectedPlayerSlot, character: selectedCharacter }));
     });
     multiplayerSocket.addEventListener('message', (event) => {
       const message = JSON.parse(event.data);
-      if (message.type === 'room:joined') multiplayerPlayerId = message.playerId;
+      if (message.type === 'server:pong') {
+        const latency = Date.now() - message.sentAt;
+        connectionBadge.textContent = latency > 500 ? `Lemah ${latency}ms` : `${latency}ms`;
+        connectionBadge.className = `connection-badge${latency > 500 ? ' weak' : ''}`;
+        return;
+      }
+      if (message.type === 'room:joined') { multiplayerPlayerId = message.playerId; multiplayerRole = message.role || 'player'; }
       if (message.type === 'room:joined' || message.type === 'room:update') {
+        const wasFinished = Boolean(multiplayerRoom?.finished);
         renderRoom(message.room);
+        const rematchButton = document.getElementById('rematchBtn');
+        if (rematchButton && message.room.finished) {
+          const votes = message.room.rematchVotes?.length || 0;
+          rematchButton.textContent = message.room.rematchVotes?.includes(multiplayerPlayerId) ? `⏳ Menunggu pemain (${votes}/${message.room.players.length})` : `✅ Siap Rematch (${votes}/${message.room.players.length})`;
+          rematchButton.disabled = message.room.rematchVotes?.includes(multiplayerPlayerId);
+        }
+        // Fallback: snapshot room yang sudah selesai juga langsung menjadi leaderboard.
+        // Ini menjaga hasil tetap muncul jika event room:finished terlewat saat koneksi pulih.
+        if (message.room.finished) showMultiplayerResults(message.room.players);
+        if (message.type === 'room:update' && wasFinished && !message.room.started && !message.room.finished) {
+          prepareMultiplayerRematchLobby();
+        }
         if (message.type === 'room:joined') {
           showMabarStep('lobby');
           roomCodeInput.value = message.room.code;
           const myPlayer = message.room.players.find((player) => player.id === multiplayerPlayerId);
           if (myPlayer) selectedPlayerSlot = myPlayer.slot;
+          if (multiplayerRole === 'spectator') setRoomStatus(`Kamu menonton room ${message.room.code} sebagai spectator.`);
           if (create) setRoomStatus(`Room ${message.room.code} berhasil dibuat. Bagikan kode ini ke temanmu.`);
         }
       }
       if (message.type === 'room:finished') {
+        multiplayerRoom = message.room;
         renderRoom(message.room);
-        showMultiplayerResults(message.results);
+        showMultiplayerResults(message.results?.length ? message.results : message.room.players);
+      }
+      if (message.type === 'room:cancelled') {
+        renderRoom(message.room);
+        prepareMultiplayerRematchLobby();
+        lobbyWaitingText.textContent = message.message;
+        setRoomStatus(message.message, 'error');
       }
       if (message.type === 'error') {
         showMabarStep(multiplayerRoom ? 'lobby' : 'setup');
@@ -1613,7 +1906,14 @@
       }
     });
     multiplayerSocket.addEventListener('close', () => {
-      if (!gameActive && !intentionalRoomClose) setRoomStatus('Koneksi room terputus. Coba gabung lagi.', 'error');
+      clearInterval(connectionPingInterval);
+      connectionBadge.textContent = 'Terputus';
+      connectionBadge.className = 'connection-badge offline';
+      if (!intentionalRoomClose && multiplayerRoom?.started && !multiplayerRoom.finished) {
+        showMultiplayerDisconnected();
+      } else if (!gameActive && !intentionalRoomClose) {
+        setRoomStatus('Koneksi room terputus. Coba gabung lagi.', 'error');
+      }
       intentionalRoomClose = false;
       joinRoomBtn.disabled = false;
       createRoomBtn.disabled = false;
@@ -2134,7 +2434,7 @@
   function handleWrong(bin, item){
     lives--;
     updateLives();
-    sendPlayerUpdate(lives <= 0 ? 'finished' : 'playing');
+    if (lives > 0) sendPlayerUpdate('playing');
     soundWrong();
     const r = bin.getBoundingClientRect();
     const areaRect = game.getBoundingClientRect();
@@ -2153,7 +2453,7 @@
   function handleMiss(item){
     lives--;
     updateLives();
-    sendPlayerUpdate(lives <= 0 ? 'finished' : 'playing');
+    if (lives > 0) sendPlayerUpdate('playing');
     soundMiss();
     showFeedback('TETOD 😵', 'bad', game.clientWidth / 2, game.clientHeight * 0.35);
     if (lives <= 0) endGame();
@@ -2197,6 +2497,7 @@
     stopBgm();
     soundGameOver();
     submitScore(score);
+    // Status akhir harus selalu terkirim walau snapshot room di browser terlambat diperbarui.
     sendPlayerUpdate('finished');
     if (multiplayerRoom?.started && !multiplayerRoom.finished) {
       showMultiplayerWaiting();
@@ -2333,6 +2634,13 @@
 
   createRoomBtn.addEventListener('click', () => prepareRoomEntry(true));
   joinRoomBtn.addEventListener('click', () => prepareRoomEntry(false));
+  spectateRoomBtn.addEventListener('click', () => {
+    if (!mabarNameInput.value.trim()) { setRoomStatus('Isi nama spectator terlebih dahulu.', 'error'); mabarNameInput.focus(); return; }
+    if (!roomCodeInput.value.trim()) { setRoomStatus('Masukkan kode room yang ingin ditonton.', 'error'); roomCodeInput.focus(); return; }
+    selectedPlayerSlot = null;
+    selectedCharacter = '👁️';
+    connectToRoom(false, true);
+  });
   characterGrid.addEventListener('click', (event) => {
     const card = event.target.closest('.character-card');
     if (!card) return;
@@ -2353,8 +2661,11 @@
     intentionalRoomClose = true;
     multiplayerRoom = null;
     multiplayerPlayerId = null;
+    multiplayerRole = 'player';
     multiplayerSocket?.close();
     multiplayerSocket = null;
+    multiplayerHud.hidden = true;
+    multiplayerHudPlayers.innerHTML = '';
     roomPlayers.innerHTML = '';
     roomCodeInput.value = '';
     showMabarStep('setup');
@@ -2435,6 +2746,11 @@
   currentUser = { username: savedGuestName || 'tamu' };
   setAuthMessage('Mode tamu aktif. Login tidak diperlukan.', 'info');
   updateStartButtonState();
+
+  syncTabletViewport();
+  window.addEventListener('resize', syncTabletViewport, { passive: true });
+  window.addEventListener('orientationchange', () => window.setTimeout(syncTabletViewport, 180), { passive: true });
+  window.visualViewport?.addEventListener('resize', syncTabletViewport, { passive: true });
 
 })();
 </script>
