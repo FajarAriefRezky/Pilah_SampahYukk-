@@ -2242,6 +2242,8 @@
       applyDifficulty();
       updateLives();
       gameActive = true;
+      clearInterval(gameplayBroadcastInterval);
+      gameplayBroadcastInterval = setInterval(sendGameplaySnapshot, 120);
       dropInterval = setInterval(spawnWave, spawnRate);
       startBgm();
       spawnWave();
