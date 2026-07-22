@@ -53,10 +53,11 @@ async function run() {
   assert.equal(spectatorJoined.role, 'spectator');
   assert.equal(spectatorJoined.room.spectators.length, 1);
   const gameplayStream = next(spectator, 'spectator:gameplay');
-  six[0].send(JSON.stringify({ type: 'player:gameplay', snapshot: { items: [{ id: 'trash1', emoji: '🍌', label: 'Kulit pisang', x: .4, y: .3 }], organik: -.2, nonOrganik: .2 } }));
+  six[0].send(JSON.stringify({ type: 'player:gameplay', snapshot: { sequence: 1, sentAt: Date.now(), items: [{ id: 'trash1', emoji: '🍌', label: 'Kulit pisang', x: .4, y: .3 }], organik: -.2, nonOrganik: .2 } }));
   const gameplayMessage = await gameplayStream;
   assert.equal(gameplayMessage.playerId, spectatorJoined.room.players[0].id);
   assert.equal(gameplayMessage.snapshot.items[0].label, 'Kulit pisang');
+  assert.equal(gameplayMessage.snapshot.sequence, 1);
   const spectatorLiveUpdate = next(spectator, 'room:update');
   const finalMessages = [...six.map((socket) => next(socket, 'room:finished')), next(spectator, 'room:finished')];
   spectator.send(JSON.stringify({ type: 'player:update', score: 9999, lives: 0, status: 'finished' }));

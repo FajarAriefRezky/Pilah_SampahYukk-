@@ -724,6 +724,7 @@
     .multiplayer-hud-player{min-width:0; padding:5px 6px; border-radius:9px; background:rgba(255,255,255,.13); color:#fff; font-size:10px; text-align:center;}
     .multiplayer-hud-player.me{outline:2px solid #ffd45f; background:rgba(255,212,95,.22);}
     .multiplayer-hud-player.watching{outline:2px solid #6ff0a0; background:rgba(91,224,139,.25); cursor:pointer;}
+    .falling-item.spectator-stream{left:0;top:0;transition:transform 75ms linear;will-change:transform;pointer-events:none;}
     .multiplayer-hud-player strong,.multiplayer-hud-player span{display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
     .multiplayer-hud-player strong{font-size:11px;}
     .multiplayer-hud-player span{margin-top:2px; color:#fff2a8; font-weight:800;}
@@ -1380,6 +1381,9 @@
   let gameplayBroadcastInterval = null;
   let spectatorViewingPlayerId = null;
   let gameplayStreamSequence = 0;
+  let gameplayFrameSequence = 0;
+  const spectatorGameplayCache = new Map();
+  const spectatorItemNodes = new Map();
 
   function syncTabletViewport() {
     const viewportHeight = window.visualViewport?.height || window.innerHeight;
@@ -1701,16 +1705,45 @@
       };
     });
     const maxOffset = Math.max(1, area.width * .42);
-    multiplayerSocket.send(JSON.stringify({ type: 'player:gameplay', snapshot: { items, organik: organikOffset / maxOffset, nonOrganik: nonOffset / maxOffset } }));
+    multiplayerSocket.send(JSON.stringify({ type: 'player:gameplay', snapshot: { sequence: ++gameplayFrameSequence, sentAt: Date.now(), items, organik: organikOffset / maxOffset, nonOrganik: nonOffset / maxOffset } }));
   }
 
   function renderSpectatorGameplay(message) {
     if (multiplayerRole !== 'spectator') return;
+    const snapshot = message.snapshot || {};
+    const previous = spectatorGameplayCache.get(message.playerId);
+    if (previous && Number(snapshot.sequence) <= Number(previous.sequence)) return;
+    spectatorGameplayCache.set(message.playerId, snapshot);
     if (!spectatorViewingPlayerId) spectatorViewingPlayerId = message.playerId;
     if (message.playerId !== spectatorViewingPlayerId) return;
-    const snapshot = message.snapshot || {};
-    playArea.innerHTML = (snapshot.items || []).map((item) => `<div class="falling-item" style="left:${item.x * 100}%;top:${item.y * 100}%;transform:translate(-50%,-50%);transition:left .12s linear,top .12s linear"><span class="item-emoji">${escapeHtml(item.emoji)}</span><span class="item-label">${escapeHtml(item.label)}</span></div>`).join('');
+    applySpectatorSnapshot(snapshot);
+  }
+
+  function clearSpectatorArena() {
+    spectatorItemNodes.forEach((node) => node.remove());
+    spectatorItemNodes.clear();
+  }
+
+  function applySpectatorSnapshot(snapshot) {
+    const visibleIds = new Set();
+    (snapshot.items || []).forEach((item) => {
+      visibleIds.add(item.id);
+      let node = spectatorItemNodes.get(item.id);
+      if (!node) {
+        node = document.createElement('div');
+        node.className = 'falling-item spectator-stream';
+        node.innerHTML = `<span class="item-emoji">${escapeHtml(item.emoji)}</span><span class="item-label">${escapeHtml(item.label)}</span>`;
+        spectatorItemNodes.set(item.id, node);
+        playArea.appendChild(node);
+      }
+      node.style.transform = `translate3d(${item.x * playArea.clientWidth}px,${item.y * playArea.clientHeight}px,0) translate(-50%,-50%)`;
+    });
+    spectatorItemNodes.forEach((node, id) => {
+      if (!visibleIds.has(id)) { node.remove(); spectatorItemNodes.delete(id); }
+    });
     const maxOffset = (playArea.clientWidth || game.clientWidth) * .42;
+    binOrganik.style.transition = 'transform 75ms linear';
+    binNon.style.transition = 'transform 75ms linear';
     binOrganik.style.transform = `translateX(${(Number(snapshot.organik) || 0) * maxOffset}px)`;
     binNon.style.transform = `translateX(${(Number(snapshot.nonOrganik) || 0) * maxOffset}px)`;
   }
@@ -1772,6 +1805,7 @@
     clearInterval(gameplayBroadcastInterval);
     stopBgm();
     playArea.querySelectorAll('.falling-item').forEach((item) => item.remove());
+    spectatorItemNodes.clear();
     document.getElementById('gameOverOverlay')?.remove();
     const overlay = document.createElement('div');
     overlay.className = 'overlay';
@@ -1820,6 +1854,8 @@
     document.getElementById('gameOverOverlay')?.remove();
     clearInterval(dropInterval);
     clearInterval(gameplayBroadcastInterval);
+    clearSpectatorArena();
+    spectatorGameplayCache.clear();
     gameActive = false;
     score = 0;
     lives = 3;
@@ -2243,7 +2279,7 @@
       updateLives();
       gameActive = true;
       clearInterval(gameplayBroadcastInterval);
-      gameplayBroadcastInterval = setInterval(sendGameplaySnapshot, 120);
+      gameplayBroadcastInterval = setInterval(sendGameplaySnapshot, 75);
       dropInterval = setInterval(spawnWave, spawnRate);
       startBgm();
       spawnWave();
@@ -2580,7 +2616,7 @@
     applyDifficulty();
     gameActive = true;
     clearInterval(gameplayBroadcastInterval);
-    gameplayBroadcastInterval = setInterval(sendGameplaySnapshot, 120);
+    gameplayBroadcastInterval = setInterval(sendGameplaySnapshot, 75);
     sendPlayerUpdate('playing');
     clearInterval(dropInterval);
     dropInterval = setInterval(spawnWave, spawnRate);
@@ -2693,7 +2729,9 @@
     const card = event.target.closest('[data-player-id]');
     if (!card) return;
     spectatorViewingPlayerId = card.dataset.playerId;
-    playArea.innerHTML = '';
+    clearSpectatorArena();
+    const cachedSnapshot = spectatorGameplayCache.get(spectatorViewingPlayerId);
+    if (cachedSnapshot) applySpectatorSnapshot(cachedSnapshot);
     renderRoom(multiplayerRoom);
   });
   characterGrid.addEventListener('click', (event) => {
@@ -2718,6 +2756,8 @@
     multiplayerPlayerId = null;
     multiplayerRole = 'player';
     spectatorViewingPlayerId = null;
+    spectatorGameplayCache.clear();
+    clearSpectatorArena();
     multiplayerSocket?.close();
     multiplayerSocket = null;
     multiplayerHud.hidden = true;
