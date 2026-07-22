@@ -574,6 +574,8 @@ wss.on('connection', (ws) => {
     if (message.type === 'player:gameplay' && player && room.started && !room.finished) {
       const rawSnapshot = message.snapshot || {};
       const snapshot = {
+        sequence: Math.max(0, Math.floor(Number(rawSnapshot.sequence) || 0)),
+        sentAt: Math.max(0, Math.floor(Number(rawSnapshot.sentAt) || Date.now())),
         items: (Array.isArray(rawSnapshot.items) ? rawSnapshot.items : []).slice(0, 16).map((item) => ({
           id: String(item.id || '').slice(0, 24),
           emoji: String(item.emoji || '🗑️').slice(0, 12),
